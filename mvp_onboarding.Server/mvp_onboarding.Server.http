@@ -1,0 +1,6 @@
+@mvp_onboarding.Server_HostAddress = http://localhost:5025
+
+GET {{mvp_onboarding.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
