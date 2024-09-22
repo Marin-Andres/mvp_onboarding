@@ -6,13 +6,11 @@ namespace mvp_onboarding.Server.Models;
 
 public partial class TalentOnboardingContext : DbContext
 {
-    public TalentOnboardingContext()
-    {
-    }
-
-    public TalentOnboardingContext(DbContextOptions<TalentOnboardingContext> options)
+    private readonly IConfiguration _configuration;
+    public TalentOnboardingContext(DbContextOptions<TalentOnboardingContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
     public virtual DbSet<Customer> Customers { get; set; }
@@ -26,8 +24,14 @@ public partial class TalentOnboardingContext : DbContext
     public virtual DbSet<Store> Stores { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:Onboarding");
-
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var connectionString = _configuration.GetConnectionString("Onboarding");
+            //optionsBuilder.UseSqlServer("Name=ConnectionStrings:Onboarding");
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Customer>(entity =>
