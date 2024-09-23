@@ -27,6 +27,10 @@ namespace mvp_onboarding.Server.Classes
         public async Task<CustomerDto> GetCustomer(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
+            if (customer == null)
+            {
+                return null;
+            }
             return CustomerMapper.EntityToDto(customer);
         }
         public async Task<CustomerDto> AddCustomer(CustomerDto customerDto)
@@ -61,8 +65,7 @@ namespace mvp_onboarding.Server.Classes
                 }
             }
 
-            var customerUpdated = await _context.Customers.FirstOrDefaultAsync(c => c.Id == id);
-            return CustomerMapper.EntityToDto(customerUpdated);
+            return CustomerMapper.EntityToDto(customer);
 
         }
         public async Task<CustomerDto> DeleteCustomer(int id)

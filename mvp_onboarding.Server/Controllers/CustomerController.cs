@@ -67,7 +67,7 @@ namespace mvp_onboarding.Server.Controllers
                 return BadRequest();
             }
 
-            var customer = _customerMethods.UpdateCustomer(id, customerDto);
+            var customer = await _customerMethods.UpdateCustomer(id, customerDto);
 
             if (customer == null)
             {
@@ -83,7 +83,7 @@ namespace mvp_onboarding.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         { 
-            var customerDto = _customerMethods.DeleteCustomer(id);
+            var customerDto = await _customerMethods.DeleteCustomer(id);
             if (customerDto == null)
             {
                 return NotFound();
