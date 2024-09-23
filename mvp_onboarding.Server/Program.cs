@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using mvp_onboarding.Server.Interfaces;
 using mvp_onboarding.Server.Models;
+using mvp_onboarding.Server.Classes;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +12,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<ICustomerMethods, CustomerMethods>();
+
 builder.Services.AddDbContext<TalentOnboardingContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("Onboarding")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Onboarding")));
 
 var app = builder.Build();
 
