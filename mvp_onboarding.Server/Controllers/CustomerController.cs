@@ -11,9 +11,9 @@ using mvp_onboarding.Server.Dtos;
 
 namespace mvp_onboarding.Server.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : Controller
+    public class CustomerController : ControllerBase
     {
         private readonly ICustomerMethods _customerMethods;
 
@@ -22,7 +22,7 @@ namespace mvp_onboarding.Server.Controllers
             _customerMethods = customerMethods;
         }
 
-        // GET: Customer
+        // GET: api/Customer
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerDto>>> GetCustomers()
         {
@@ -37,7 +37,7 @@ namespace mvp_onboarding.Server.Controllers
             }
         }
 
-        // GET: Customer/5
+        // GET: api/Customer/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerDto>> GetCustomer(int id)
         {
@@ -51,20 +51,35 @@ namespace mvp_onboarding.Server.Controllers
             return Ok(customerDto);
         }
 
-        // POST: Customer
+        // POST: api/Customer
         [HttpPost]
-        public async Task<ActionResult<CustomerDto>> AddCustomer(CustomerDto customerDto)
+        public async Task<ActionResult<CustomerDto>> AddCustomer([FromBody] CustomerDto customerDto)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.
+                    SelectMany(v => v.Errors).
+                    Select(e => e.ErrorMessage).ToList();
+                return BadRequest(errors);
+            }
             return await _customerMethods.AddCustomer(customerDto);
         }
 
-        //PUT: Custmer/5
+        //PUT: api/Customer/5
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateCustomer(int id, CustomerDto customerDto)
         {
             if (id != customerDto.Id)
             {
-                return BadRequest();
+                return BadRequest("Customer Id mismatches payload");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.
+                    SelectMany(v => v.Errors).
+                    Select(e => e.ErrorMessage).ToList();
+                return BadRequest(errors);
             }
 
             var customer = await _customerMethods.UpdateCustomer(id, customerDto);
@@ -79,7 +94,7 @@ namespace mvp_onboarding.Server.Controllers
             }
         }
 
-        //DELETE: Customer/5
+        //DELETE: api/Customer/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         { 
