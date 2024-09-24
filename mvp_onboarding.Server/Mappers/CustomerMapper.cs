@@ -16,6 +16,17 @@ namespace mvp_onboarding.Server.Mappers
 
             return entity;
         }
+        public static Customer DtoToEntity(CustomerUpdateDto customerDto)
+        {
+            var entity = new Customer
+            {
+                Id = customerDto.Id,
+                Name = customerDto.Name,
+                Address = customerDto.Address
+            };
+
+            return entity;
+        }
 
         public static CustomerDto EntityToDto(Customer customer)
         {
@@ -28,5 +39,6 @@ namespace mvp_onboarding.Server.Mappers
             
             return customerDto;
         }
+
     }
 }

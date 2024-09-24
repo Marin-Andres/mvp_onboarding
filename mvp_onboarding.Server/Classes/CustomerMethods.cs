@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using mvp_onboarding.Server.Dtos;
+﻿using mvp_onboarding.Server.Dtos;
 using mvp_onboarding.Server.Interfaces;
 using mvp_onboarding.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using mvp_onboarding.Server.Mappers;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace mvp_onboarding.Server.Classes
 {
@@ -42,7 +40,7 @@ namespace mvp_onboarding.Server.Classes
 
             return CustomerMapper.EntityToDto(customer);
         }
-        public async Task<CustomerDto> UpdateCustomer(int id, CustomerDto customerDto)
+        public async Task<CustomerDto> UpdateCustomer(int id, CustomerUpdateDto customerDto)
         {
 
             var customer = CustomerMapper.DtoToEntity(customerDto);

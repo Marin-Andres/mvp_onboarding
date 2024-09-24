@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using mvp_onboarding.Server.Interfaces;
-using mvp_onboarding.Server.Models;
 using mvp_onboarding.Server.Dtos;
 
 namespace mvp_onboarding.Server.Controllers
@@ -67,7 +60,7 @@ namespace mvp_onboarding.Server.Controllers
 
         //PUT: api/Customer/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCustomer(int id, CustomerDto customerDto)
+        public async Task<ActionResult> UpdateCustomer([FromRoute] int id, [FromBody] CustomerUpdateDto customerDto)
         {
             if (id != customerDto.Id)
             {
