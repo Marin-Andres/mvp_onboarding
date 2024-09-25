@@ -9,5 +9,6 @@ namespace mvp_onboarding.Server.Interfaces
         Task<CustomerDto> DeleteCustomer(int id);
         Task<CustomerDto> GetCustomer(int id);
         Task<IEnumerable<CustomerDto>> GetCustomers();
+        public bool CustomerExists(int id);
     }
 }

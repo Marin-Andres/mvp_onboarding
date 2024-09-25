@@ -79,7 +79,7 @@ namespace mvp_onboarding.Server.Classes
 
             return ProductMapper.EntityToDto(product);
         }
-        private bool ProductExists(int id)
+        public bool ProductExists(int id)
         {
             return _context.Products.Any(e => e.Id == id);
         }

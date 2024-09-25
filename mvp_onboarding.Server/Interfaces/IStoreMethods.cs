@@ -9,5 +9,6 @@ namespace mvp_onboarding.Server.Interfaces
         Task<StoreDto> DeleteStore(int id);
         Task<StoreDto> GetStore(int id);
         Task<IEnumerable<StoreDto>> GetStores();
+        public bool StoreExists(int id);
     }
 }

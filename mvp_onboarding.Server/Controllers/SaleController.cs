@@ -9,10 +9,16 @@ namespace mvp_onboarding.Server.Controllers
     public class SaleController : ControllerBase
     {
         private readonly ISaleMethods _saleMethods;
+        private readonly ICustomerMethods _customerMethods;
+        private readonly IStoreMethods _storeMethods;
+        private readonly IProductMethods _productMethods;
 
-        public SaleController(ISaleMethods saleMethods)
+        public SaleController(ISaleMethods saleMethods, ICustomerMethods customerMethods, IStoreMethods storeMethods, IProductMethods productMethods)
         {
             _saleMethods = saleMethods;
+            _customerMethods = customerMethods;
+            _storeMethods = storeMethods;
+            _productMethods = productMethods;
         }
 
         // GET: api/Sale
@@ -55,6 +61,15 @@ namespace mvp_onboarding.Server.Controllers
                     Select(e => e.ErrorMessage).ToList();
                 return BadRequest(errors);
             }
+            //make sure customer, product and store exist
+            if (
+                (!_customerMethods.CustomerExists((int)saleDto.CustomerId)) ||
+                (!_productMethods.ProductExists((int)saleDto.ProductId)) ||
+                (!_storeMethods.StoreExists((int)saleDto.StoreId))
+               )
+            {
+                return BadRequest("Invalid input for sales table.");
+            }
             if (saleDto.Id == 0)
             {
                 return await _saleMethods.AddSale(saleDto);
@@ -81,9 +96,17 @@ namespace mvp_onboarding.Server.Controllers
                     Select(e => e.ErrorMessage).ToList();
                 return BadRequest(errors);
             }
+            //make sure customer, product and store exist
+            if (
+                (!_customerMethods.CustomerExists((int)saleDto.CustomerId)) ||
+                (!_productMethods.ProductExists((int)saleDto.ProductId)) ||
+                (!_storeMethods.StoreExists((int)saleDto.StoreId))
+               )
+            {
+                return BadRequest("Invalid input for sales table.");
+            }
 
             var sale = await _saleMethods.UpdateSale(id, saleDto);
-
             if (sale == null)
             {
                 return NotFound();

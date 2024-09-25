@@ -79,7 +79,7 @@ namespace mvp_onboarding.Server.Classes
 
             return CustomerMapper.EntityToDto(customer);
         }
-        private bool CustomerExists(int id)
+        public bool CustomerExists(int id)
         {
             return _context.Customers.Any(e => e.Id == id);
         }
