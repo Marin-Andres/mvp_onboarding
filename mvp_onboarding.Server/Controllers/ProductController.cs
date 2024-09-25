@@ -55,7 +55,14 @@ namespace mvp_onboarding.Server.Controllers
                     Select(e => e.ErrorMessage).ToList();
                 return BadRequest(errors);
             }
-            return await _productMethods.AddProduct(productDto);
+            if (productDto.Id == 0)
+            {
+                return await _productMethods.AddProduct(productDto);
+            }
+            else
+            {
+                return BadRequest("Unable to add new record with fixed Id.");
+            }
         }
 
         //PUT: api/Product/5
