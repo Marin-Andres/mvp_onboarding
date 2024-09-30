@@ -17,11 +17,15 @@ const CustomerTable = () => {
     const [editOpen, setEditOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [createIsDisabled, setCreateIsDisabled] = useState(true);
-    const [editIsDisabled, setEditIsDisabled] =useState(true);
+    const [editIsDisabled, setEditIsDisabled] = useState(true);
+    const [selectedAddress, setSelectedAddress] = useState("");
+    const [selectedName, setSelectedName] = useState("");
 
     useEffect(() => {
         fetchCustomers();
-    }, []);
+        setCreateIsDisabled(invalidSelectedCustomer);
+        setEditIsDisabled(invalidSelectedCustomer);
+    }, [selectedAddress, selectedName]);
 
     const fetchCustomers = async () => {
         try {
@@ -48,6 +52,41 @@ const CustomerTable = () => {
             }
         }
     };
+    
+    const handleEditSubmit = async () => {
+        let newCustomer = {
+            id: selectedCustomer.id,
+            name: selectedName,
+            address: selectedAddress
+        };
+        if (newCustomer) {
+            try {
+                await updateCustomer(selectedCustomer.id, newCustomer);
+                fetchCustomers();            }
+            catch (error) {
+                console.error("Failed to update customer", error);
+            }
+            setEditOpen(false);
+        }  
+    
+    }  
+    const handleNewSubmit = async () => {
+        let newCustomer = {
+            id: "0",
+            name: selectedName,
+            address: selectedAddress
+        };
+        setSelectedCustomer(newCustomer);
+        if (newCustomer) {
+            try {
+                await createCustomer(newCustomer);
+                fetchCustomers();            }
+            catch (error) {
+                console.error("Failed to add new customer", error);
+            }
+            setNewOpen(false);
+        } 
+    };
 
     const confirmDelete = (customer) => {
         setSelectedCustomer(customer);
@@ -56,66 +95,37 @@ const CustomerTable = () => {
     
     const confirmEdit = (customer) => {
         setSelectedCustomer(customer);
+        setSelectedName(customer.name);
+        setSelectedAddress(customer.address);
         setEditOpen(true);
-    };
-
-    const handleNewSubmit = async () => {
-        if (selectedCustomer) {
-            try {
-                await createCustomer(selectedCustomer);
-                setNewOpen(false);
-                fetchCustomers();            }
-            catch (error) {
-                console.error("Failed to add new customer", error);
-            }
-        } 
     };
 
     const confirmNewSubmit = () => {
         const customer = { id: "0", name: "", address: "" };
+        setSelectedName("");
+        setSelectedAddress("");
         setSelectedCustomer(customer);
         setNewOpen(true);
     };
-    
+
+   
     const handleNameChange = (event) => {
-        const changedName = event.target.value;
-        const customer = selectedCustomer;
-        customer.name = changedName;
-        setSelectedCustomer(customer);
-        setCreateIsDisabled(invalidSelectedCustomer);
-        setEditIsDisabled(invalidSelectedCustomer);
+        setSelectedName(event.target.value);
     };
 
     const handleAddressChange = (event) => {
-        const changedAddress = event.target.value;
-        const customer = selectedCustomer;
-        customer.address = changedAddress;
-        setSelectedCustomer(customer);
-        setCreateIsDisabled(invalidSelectedCustomer);
-        setEditIsDisabled(invalidSelectedCustomer);
+        setSelectedAddress(event.target.value);
     };
 
     const invalidSelectedCustomer = () => {
-        if (selectedCustomer.name === "") {
+        if (selectedName === "") {
             return true;
         }
-        if (selectedCustomer.address === "") {
+        if (selectedAddress === "") {
             return true;
         }
         return false;
     }
-
-    const handleEditSubmit = async () => {
-        if (selectedCustomer) {
-            try {
-                await updateCustomer(selectedCustomer.id, selectedCustomer);
-                setEditOpen(false);
-                fetchCustomers();            }
-            catch (error) {
-                console.error("Failed to update customer", error);
-            }
-        }  
-    };
 
     if (loading) return <p>Loading...</p>;
 
@@ -185,7 +195,7 @@ const CustomerTable = () => {
             <Modal.Header>Create customer</Modal.Header>
             <Modal.Content>
                 <Form onSubmit={handleNewSubmit}>
-                    <div class="field">
+                    <div>
                         <label>NAME</label> 
                         <Input
                             type = "text"
@@ -194,7 +204,7 @@ const CustomerTable = () => {
                             onChange={handleNameChange}
                         />
                     </div>
-                    <div class = "field">
+                    <div>
                         <label>ADDRESS</label>
                         <Input
                             type = "text"
@@ -227,24 +237,24 @@ const CustomerTable = () => {
             <Modal.Header>Edit customer</Modal.Header>
             <Modal.Content>
                 <Form onSubmit={handleEditSubmit}>
-                    <div class="field">
+                    <div>
                         <label>NAME</label> 
                         <Input
                             type = "text"
                             name = "customerName"
                             placeholder = "Name"
                             onChange={handleNameChange}
-                            value={selectedCustomer?.name}
+                            value={selectedName}
                         />
                     </div>
-                    <div class = "field">
+                    <div>
                         <label>ADDRESS</label>
                         <Input
                             type = "text"
                             name = "customerAddress"
                             placeholder = "Address"
                             onChange={handleAddressChange}
-                            value={selectedCustomer?.address}
+                            value={selectedAddress}
                         />
                     </div>
                 </Form>
