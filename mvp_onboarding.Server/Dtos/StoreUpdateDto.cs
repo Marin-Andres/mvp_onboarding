@@ -13,7 +13,7 @@ namespace mvp_onboarding.Server.Dtos
         public string? Name { get; set; }
         
         [Required(ErrorMessage = "Store address is required.")]
-        [StringLength(500, MinimumLength = 6)]
+        [StringLength(500, MinimumLength = 1)]
         public string? Address { get; set; }
     }
 }

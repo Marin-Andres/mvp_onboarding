@@ -1,9 +1,6 @@
-import React, { useState } from "react";
 import { Menu } from "semantic-ui-react";
 
-const MainMenu = () => {
-const [activeMenu, setActiveMenu] = useState("Customers");
-
+const MainMenu = ({activeMenu, setActiveMenu}) => {
 
     return (
         <div>
@@ -29,7 +26,6 @@ const [activeMenu, setActiveMenu] = useState("Customers");
                     Sales
                 </Menu.Item>
             </Menu>
-
         </div>
     );
 };

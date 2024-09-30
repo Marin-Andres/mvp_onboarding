@@ -7,7 +7,7 @@ namespace mvp_onboarding.Server.Dtos
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Product name is required.")]
-        [StringLength(200, MinimumLength = 6)]
+        [StringLength(200, MinimumLength = 1)]
         public string? Name { get; set; }
 
         [Required(ErrorMessage = "Product price is required.")]
