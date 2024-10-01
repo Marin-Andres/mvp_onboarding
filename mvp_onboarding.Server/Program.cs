@@ -16,6 +16,7 @@ builder.Services.AddScoped<ICustomerMethods, CustomerMethods>();
 builder.Services.AddScoped<IProductMethods, ProductMethods>();
 builder.Services.AddScoped<IStoreMethods, StoreMethods>();
 builder.Services.AddScoped<ISaleMethods, SaleMethods>();
+builder.Services.AddScoped<ISalesViewMethods, SalesViewMethods>();
 
 builder.Services.AddDbContext<TalentOnboardingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Onboarding")));
