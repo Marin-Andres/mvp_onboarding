@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getSales, deleteSale, createSale, updateSale } from "../services/saleService";
+import { getSalesView } from "../services/salesViewService";
 import {
   Table,
   Button,
@@ -27,7 +28,7 @@ const SaleTable = () => {
 
   const fetchSales = async () => {
     try {
-      const data = await getSales();
+      const data = await getSalesView();
       if (data?.length > 0) {
         setSales(data);
       }
@@ -148,9 +149,9 @@ const SaleTable = () => {
         <Table.Body>
           {sales.map((sale) => (
             <Table.Row key={sale.id}>
-              <Table.Cell>{sale.customerId}</Table.Cell>
-              <Table.Cell>{sale.productId}</Table.Cell>
-              <Table.Cell>{sale.storeId}</Table.Cell>
+              <Table.Cell>{sale.customer}</Table.Cell>
+              <Table.Cell>{sale.product}</Table.Cell>
+              <Table.Cell>{sale.store}</Table.Cell>
               <Table.Cell>{sale.dateSold}</Table.Cell>
               <Table.Cell>
                 <Button color="yellow" onClick={() => confirmEdit(sale)}>
