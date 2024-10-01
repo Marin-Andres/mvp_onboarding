@@ -17,14 +17,12 @@ const SaleTable = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [createIsDisabled, setCreateIsDisabled] = useState(true);
-  const [editIsDisabled, setEditIsDisabled] = useState(true);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [selectedName, setSelectedName] = useState("");
 
   useEffect(() => {
     fetchSales();
     setCreateIsDisabled(invalidSelectedSale);
-    setEditIsDisabled(invalidSelectedSale);
   }, [selectedAddress, selectedName]);
 
   const fetchSales = async () => {
@@ -138,8 +136,10 @@ const SaleTable = () => {
       <Table className="ui celled table" striped>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Address</Table.HeaderCell>
+            <Table.HeaderCell>Customer</Table.HeaderCell>
+            <Table.HeaderCell>Product</Table.HeaderCell>
+            <Table.HeaderCell>Store</Table.HeaderCell>
+            <Table.HeaderCell>Date Sold</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
           </Table.Row>
@@ -148,8 +148,10 @@ const SaleTable = () => {
         <Table.Body>
           {sales.map((sale) => (
             <Table.Row key={sale.id}>
-              <Table.Cell>{sale.name}</Table.Cell>
-              <Table.Cell>{sale.address}</Table.Cell>
+              <Table.Cell>{sale.customerId}</Table.Cell>
+              <Table.Cell>{sale.productId}</Table.Cell>
+              <Table.Cell>{sale.storeId}</Table.Cell>
+              <Table.Cell>{sale.dateSold}</Table.Cell>
               <Table.Cell>
                 <Button color="yellow" onClick={() => confirmEdit(sale)}>
                   <Icon name="edit" /> EDIT
@@ -264,7 +266,7 @@ const SaleTable = () => {
           <Button color="black" onClick={() => setEditOpen(false)}>
             cancel
           </Button>
-          <Button positive onClick={handleEditSubmit} type="submit" disabled={editIsDisabled}>
+          <Button positive onClick={handleEditSubmit} type="submit" >
             edit &nbsp;
             <Icon name="checkmark" />
           </Button>
