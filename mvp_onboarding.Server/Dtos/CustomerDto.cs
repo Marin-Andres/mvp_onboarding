@@ -1,5 +1,4 @@
-﻿using mvp_onboarding.Server.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace mvp_onboarding.Server.Dtos
 {
