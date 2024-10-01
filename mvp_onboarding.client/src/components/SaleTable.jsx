@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import { getSales, deleteSale, createSale, updateSale } from "../services/saleService";
 import { getSalesView } from "../services/salesViewService";
 import {
@@ -18,13 +19,13 @@ const SaleTable = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [createIsDisabled, setCreateIsDisabled] = useState(true);
-  const [selectedAddress, setSelectedAddress] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
   const [selectedName, setSelectedName] = useState("");
 
   useEffect(() => {
     fetchSales();
     setCreateIsDisabled(invalidSelectedSale);
-  }, [selectedAddress, selectedName]);
+  }, [selectedName]);
 
   const fetchSales = async () => {
     try {
@@ -54,8 +55,7 @@ const SaleTable = () => {
   const handleEditSubmit = async () => {
     let newSale = {
       id: selectedSale.id,
-      name: selectedName,
-      address: selectedAddress
+      name: selectedName
     };
     if (newSale) {
       try {
@@ -72,8 +72,7 @@ const SaleTable = () => {
   const handleNewSubmit = async () => {
     let newSale = {
       id: "0",
-      name: selectedName,
-      address: selectedAddress
+      name: selectedName
     };
     setSelectedSale(newSale);
     if (newSale) {
@@ -96,14 +95,12 @@ const SaleTable = () => {
   const confirmEdit = (sale) => {
     setSelectedSale(sale);
     setSelectedName(sale.name);
-    setSelectedAddress(sale.address);
     setEditOpen(true);
   };
 
   const confirmNewSubmit = () => {
-    const sale = { id: "0", name: "", address: "" };
+    const sale = { id: "0", name: "" };
     setSelectedName("");
-    setSelectedAddress("");
     setSelectedSale(sale);
     setNewOpen(true);
   };
@@ -113,15 +110,8 @@ const SaleTable = () => {
     setSelectedName(event.target.value);
   };
 
-  const handleAddressChange = (event) => {
-    setSelectedAddress(event.target.value);
-  };
-
   const invalidSelectedSale = () => {
     if (selectedName === "") {
-      return true;
-    }
-    if (selectedAddress === "") {
       return true;
     }
     return false;
@@ -199,24 +189,29 @@ const SaleTable = () => {
         <Modal.Header>Create sale</Modal.Header>
         <Modal.Content>
           <Form onSubmit={handleNewSubmit}>
-            <div>
-              <label>NAME</label>
+            <Form.Field>
+              <label>Date sold</label>
+              <DatePicker
+                selected={startDate}
+                onChange={setStartDate}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Customer</label>
               <Input
                 type="text"
-                name="saleName"
-                placeholder="Name"
-                onChange={handleNameChange}
               />
-            </div>
-            <div>
-              <label>ADDRESS</label>
-              <Input
-                type="text"
-                name="saleAddress"
-                placeholder="Address"
-                onChange={handleAddressChange}
-              />
-            </div>
+            </Form.Field>
+            <Form.Field>
+              <label>Product</label>
+              <Input>
+              </Input>
+            </Form.Field>
+            <Form.Field>
+              <label>Store</label>
+              <Input>
+              </Input>
+            </Form.Field>
           </Form>
         </Modal.Content>
         <Modal.Actions>
@@ -252,13 +247,9 @@ const SaleTable = () => {
               />
             </Form.Field>
             <Form.Field>
-              <label>ADDRESS</label>
+              <label>Product</label>
               <Input
                 type="text"
-                name="saleAddress"
-                placeholder="Address"
-                onChange={handleAddressChange}
-                value={selectedAddress}
               />
             </Form.Field>
           </Form>
