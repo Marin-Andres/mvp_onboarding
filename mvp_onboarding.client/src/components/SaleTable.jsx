@@ -157,19 +157,24 @@ const SaleTable = () => {
 
   const confirmEdit = (saleView) => {
     setSelectedSaleView(saleView);
-    let sale = fetchSale(saleView.id);
-    setSelectedCustomer(sale?.customerId);
-    setSelectedProduct(sale?.productId);
-    setSelectedStore(sale?.storeId);
-    setSoldDate(sale?.dateSold);
-    setEditOpen(true);
-    fetchCustomers();
-    fetchStores();
-    fetchProducts();
     console.log("saleView:", saleView)
-    console.log("customer selected:", selectedCustomer);
-    console.log("selectedSale:", selectedSale);
-    setEditOpen(true);
+    let sale = null;
+    fetchSale(saleView.id)
+      .then(sale => {
+        setSelectedSale(sale);
+        setSelectedCustomer(sale?.customerId);
+        setSelectedProduct(sale?.productId);
+        setSelectedStore(sale?.storeId);
+        setSoldDate(sale?.dateSold);
+        fetchCustomers();
+        fetchStores();
+        fetchProducts();
+        setEditOpen(true);
+        setEditOpen(true);
+      })
+      .catch(error => {
+        console.error("Failed to fetch sale", error);
+      });
   };
 
   const confirmNewSubmit = () => {
