@@ -113,12 +113,13 @@ const SaleTable = () => {
   };
 
   const handleEditSubmit = async () => {
+    let dateOnly = soldDate.toISOString().slice(0, 10);
     let newSale = {
       id: selectedSaleView.id,
       customerId: selectedCustomer,
       productId: selectedProduct,
       storeId: selectedStore,
-      dateSold: soldDate
+      dateSold: dateOnly
     };
     if (newSale) {
       try {
@@ -133,14 +134,14 @@ const SaleTable = () => {
 
   }
   const handleNewSubmit = async () => {
+    let dateOnly = soldDate.toISOString().slice(0, 10);
     let newSale = {
       id: "0",
       customerId: selectedCustomer,
       productId: selectedProduct,
       storeId: selectedStore,
-      dateSold: soldDate
+      dateSold: dateOnly
     };
-    setSelectedSale(newSale);
     if (newSale) {
       try {
         await createSale(newSale);
@@ -166,7 +167,7 @@ const SaleTable = () => {
         setSelectedCustomer(sale?.customerId);
         setSelectedProduct(sale?.productId);
         setSelectedStore(sale?.storeId);
-        setSoldDate(sale?.dateSold);
+        setSoldDate(new Date(sale?.dateSold));
         setEditOpen(true);
       })
       .catch(error => {
