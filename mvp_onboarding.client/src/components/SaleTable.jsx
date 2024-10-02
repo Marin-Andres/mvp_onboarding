@@ -34,9 +34,12 @@ const SaleTable = () => {
 
   useEffect(() => {
     fetchSales();
+    fetchCustomers();
+    fetchStores();
+    fetchProducts();
     setCreateIsDisabled(invalidSelectedSale);
     setEditIsDisabled(invalidSelectedSale);
-  }, []);
+  }, [selectedCustomer, selectedStore, selectedProduct]);
 
   const fetchSales = async () => {
     try {
@@ -157,8 +160,6 @@ const SaleTable = () => {
 
   const confirmEdit = (saleView) => {
     setSelectedSaleView(saleView);
-    console.log("saleView:", saleView)
-    let sale = null;
     fetchSale(saleView.id)
       .then(sale => {
         setSelectedSale(sale);
@@ -166,10 +167,6 @@ const SaleTable = () => {
         setSelectedProduct(sale?.productId);
         setSelectedStore(sale?.storeId);
         setSoldDate(sale?.dateSold);
-        fetchCustomers();
-        fetchStores();
-        fetchProducts();
-        setEditOpen(true);
         setEditOpen(true);
       })
       .catch(error => {
@@ -191,30 +188,30 @@ const SaleTable = () => {
   };
 
   const handleCustomerChange = (e) => {
-    setSelectedCustomer(e.target.value);
+    setSelectedCustomer(Number(e.target.value));
   };
 
   const handleProductChange = (e) => {
-    setSelectedProduct(e.target.value);
+    setSelectedProduct(Number(e.target.value));
   };
 
   const handleStoreChange = (e) => {
-    setSelectedStore(e.target.value);
+    setSelectedStore(Number(e.target.value));
   };
 
   const invalidSelectedSale = () => {
     if (!selectedSale) {
       return true
     }
-    let isCustomerIdPresent = customers.some(customer => customer.id === selectedSale.customerId);
+    let isCustomerIdPresent = customers.some(customer => customer.id === selectedCustomer);
     if (!isCustomerIdPresent) {
       return true;
     }
-    let isProductIdPresent = products.some(product => product.id === selectedSale.productId);
+    let isProductIdPresent = products.some(product => product.id === selectedProduct);
     if (!isProductIdPresent) {
       return true;
     }
-    let isStoreIdPresent = stores.some(store => store.id === selectedSale.storeId);
+    let isStoreIdPresent = stores.some(store => store.id === selectedStore);
     if (!isStoreIdPresent) {
       return true;
     }
