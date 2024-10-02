@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import { getSales, deleteSale, createSale, updateSale } from "../services/saleService";
+import { getSale, deleteSale, createSale, updateSale } from "../services/saleService";
 import { getSalesView } from "../services/salesViewService";
+import { getCustomers } from "../services/customerService";
+import { getStores } from "../services/storeService";
+import { getProducts } from "../services/productService";
 import {
   Table,
   Button,
@@ -18,14 +21,22 @@ const SaleTable = () => {
   const [newOpen, setNewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
+  const [selectedSaleView, setSelectedSaleView] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedStore, setSelectedStore] = useState(null);
   const [createIsDisabled, setCreateIsDisabled] = useState(true);
-  const [startDate, setStartDate] = useState(new Date());
-  const [selectedName, setSelectedName] = useState("");
+  const [editIsDisabled, setEditIsDisabled] = useState(true);
+  const [soldDate, setSoldDate] = useState(new Date());
+  const [customers, setCustomers] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [stores, setStores] = useState([]);
 
   useEffect(() => {
     fetchSales();
     setCreateIsDisabled(invalidSelectedSale);
-  }, [selectedName]);
+    setEditIsDisabled(invalidSelectedSale);
+  }, []);
 
   const fetchSales = async () => {
     try {
@@ -39,11 +50,57 @@ const SaleTable = () => {
       setLoading(false);
     }
   };
+
+  const fetchSale = async (id) => {
+    let sale = null;
+    try {
+      sale = await getSale(id);
+    } catch (error) {
+      console.error("Failed to fetch sale", error);
+      sale = null;
+    } finally {
+      return sale;
+    }
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      const data = await getCustomers();
+      if (data?.length > 0) {
+        setCustomers(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch customers", error);
+    }
+  };
+
+  const fetchStores = async () => {
+    try {
+      const data = await getStores();
+      if (data?.length > 0) {
+        setStores(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch stores", error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      if (data?.length > 0) {
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+    }
+  };
+
   const handleDelete = async () => {
-    if (selectedSale) {
+    if (selectedSaleView) {
       try {
-        await deleteSale(selectedSale?.id);
-        setSales(sales.filter((sale) => sale.id !== selectedSale?.id));
+        await deleteSale(selectedSaleView?.id);
+        setSales(sales.filter((sale) => sale.id !== selectedSaleView?.id));
         setDeleteOpen(false);
       }
       catch (error) {
@@ -54,12 +111,15 @@ const SaleTable = () => {
 
   const handleEditSubmit = async () => {
     let newSale = {
-      id: selectedSale.id,
-      name: selectedName
+      id: selectedSaleView.id,
+      customerId: selectedCustomer,
+      productId: selectedProduct,
+      storeId: selectedStore,
+      dateSold: soldDate
     };
     if (newSale) {
       try {
-        await updateSale(selectedSale.id, newSale);
+        await updateSale(selectedSaleView.id, newSale);
         fetchSales();
       }
       catch (error) {
@@ -72,7 +132,10 @@ const SaleTable = () => {
   const handleNewSubmit = async () => {
     let newSale = {
       id: "0",
-      name: selectedName
+      customerId: selectedCustomer,
+      productId: selectedProduct,
+      storeId: selectedStore,
+      dateSold: soldDate
     };
     setSelectedSale(newSale);
     if (newSale) {
@@ -87,35 +150,72 @@ const SaleTable = () => {
     }
   };
 
-  const confirmDelete = (sale) => {
-    setSelectedSale(sale);
+  const confirmDelete = (saleView) => {
+    setSelectedSaleView(saleView);
     setDeleteOpen(true);
   };
 
-  const confirmEdit = (sale) => {
-    setSelectedSale(sale);
-    setSelectedName(sale.name);
+  const confirmEdit = (saleView) => {
+    setSelectedSaleView(saleView);
+    let sale = fetchSale(saleView.id);
+    setSelectedCustomer(sale?.customerId);
+    setSelectedProduct(sale?.productId);
+    setSelectedStore(sale?.storeId);
+    setSoldDate(sale?.dateSold);
+    setEditOpen(true);
+    fetchCustomers();
+    fetchStores();
+    fetchProducts();
+    console.log("saleView:", saleView)
+    console.log("customer selected:", selectedCustomer);
+    console.log("selectedSale:", selectedSale);
     setEditOpen(true);
   };
 
   const confirmNewSubmit = () => {
-    const sale = { id: "0", name: "" };
-    setSelectedName("");
+    const sale = { id: "0", };
     setSelectedSale(sale);
+    setSelectedCustomer("");
+    setSelectedStore("");
+    setSelectedProduct("");
+    setSoldDate(new Date());
+    fetchCustomers();
+    fetchStores();
+    fetchProducts();
     setNewOpen(true);
   };
 
+  const handleCustomerChange = (e) => {
+    setSelectedCustomer(e.target.value);
+  };
 
-  const handleNameChange = (event) => {
-    setSelectedName(event.target.value);
+  const handleProductChange = (e) => {
+    setSelectedProduct(e.target.value);
+  };
+
+  const handleStoreChange = (e) => {
+    setSelectedStore(e.target.value);
   };
 
   const invalidSelectedSale = () => {
-    if (selectedName === "") {
+    if (!selectedSale) {
+      return true
+    }
+    let isCustomerIdPresent = customers.some(customer => customer.id === selectedSale.customerId);
+    if (!isCustomerIdPresent) {
       return true;
     }
+    let isProductIdPresent = products.some(product => product.id === selectedSale.productId);
+    if (!isProductIdPresent) {
+      return true;
+    }
+    let isStoreIdPresent = stores.some(store => store.id === selectedSale.storeId);
+    if (!isStoreIdPresent) {
+      return true;
+    }
+    // is a date check needed or is datepicker already validating input??
     return false;
-  }
+  };
 
   if (loading) return <p>Loading...</p>;
 
@@ -192,25 +292,45 @@ const SaleTable = () => {
             <Form.Field>
               <label>Date sold</label>
               <DatePicker
-                selected={startDate}
-                onChange={setStartDate}
+                selected={soldDate}
+                onChange={setSoldDate}
               />
             </Form.Field>
             <Form.Field>
               <label>Customer</label>
-              <Input
-                type="text"
-              />
+              <select
+                class="ui search dropdown"
+                value={selectedCustomer}
+                onChange={handleCustomerChange}
+              >
+                {[{ id: "", name: "" }, ...customers].map((customer) => (
+                  <option key={customer.id} value={customer.id}>{customer.name}</option>
+                ))}
+              </select>
             </Form.Field>
             <Form.Field>
               <label>Product</label>
-              <Input>
-              </Input>
+              <select
+                class="ui search dropdown"
+                value={selectedProduct}
+                onChange={handleProductChange}
+              >
+                {[{ id: "", name: "" }, ...products].map((product) => (
+                  <option key={product.id} value={product.id}>{product.name}</option>
+                ))}
+              </select>
             </Form.Field>
             <Form.Field>
               <label>Store</label>
-              <Input>
-              </Input>
+              <select
+                class="ui search dropdown"
+                value={selectedStore}
+                onChange={handleStoreChange}
+              >
+                {[{ id: "", name: "" }, ...stores].map((store) => (
+                  <option key={store.id} value={store.id}>{store.name}</option>
+                ))}
+              </select>
             </Form.Field>
           </Form>
         </Modal.Content>
@@ -237,20 +357,47 @@ const SaleTable = () => {
         <Modal.Content>
           <Form onSubmit={handleEditSubmit}>
             <Form.Field>
-              <label>NAME</label>
-              <Input
-                type="text"
-                name="saleName"
-                placeholder="Name"
-                onChange={handleNameChange}
-                value={selectedName}
+              <label>Date sold</label>
+              <DatePicker
+                selected={soldDate}
+                onChange={setSoldDate}
               />
             </Form.Field>
             <Form.Field>
+              <label>Customer</label>
+              <select
+                class="ui search dropdown"
+                value={selectedCustomer}
+                onChange={handleCustomerChange}
+              >
+                {[{ id: "", name: "" }, ...customers].map((customer) => (
+                  <option key={customer.id} value={customer.id}>{customer.name}</option>
+                ))}
+              </select>
+            </Form.Field>
+            <Form.Field>
               <label>Product</label>
-              <Input
-                type="text"
-              />
+              <select
+                class="ui search dropdown"
+                value={selectedProduct}
+                onChange={handleProductChange}
+              >
+                {[{ id: "", name: "" }, ...products].map((product) => (
+                  <option key={product.id} value={product.id}>{product.name}</option>
+                ))}
+              </select>
+            </Form.Field>
+            <Form.Field>
+              <label>Store</label>
+              <select
+                class="ui search dropdown"
+                value={selectedStore}
+                onChange={handleStoreChange}
+              >
+                {[{ id: "", name: "" }, ...stores].map((store) => (
+                  <option key={store.id} value={store.id}>{store.name}</option>
+                ))}
+              </select>
             </Form.Field>
           </Form>
         </Modal.Content>
@@ -258,7 +405,7 @@ const SaleTable = () => {
           <Button color="black" onClick={() => setEditOpen(false)}>
             cancel
           </Button>
-          <Button positive onClick={handleEditSubmit} type="submit" >
+          <Button positive onClick={handleEditSubmit} type="submit" disabled={editIsDisabled} >
             edit &nbsp;
             <Icon name="checkmark" />
           </Button>
