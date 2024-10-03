@@ -37,6 +37,10 @@ const SaleTable = () => {
     fetchCustomers();
     fetchStores();
     fetchProducts();
+  }, []); //fetch list on mount
+
+
+  useEffect(() => {
     setCreateIsDisabled(invalidSelectedSale);
     setEditIsDisabled(invalidSelectedSale);
   }, [selectedCustomer, selectedStore, selectedProduct]);

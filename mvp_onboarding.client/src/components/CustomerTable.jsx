@@ -23,6 +23,9 @@ const CustomerTable = () => {
 
   useEffect(() => {
     fetchCustomers();
+  }, []); //fetch list on mount
+
+  useEffect(() => {
     setCreateIsDisabled(invalidSelectedCustomer);
     setEditIsDisabled(invalidSelectedCustomer);
   }, [selectedAddress, selectedName]);

@@ -23,6 +23,10 @@ const StoreTable = () => {
 
   useEffect(() => {
     fetchStores();
+  }, []); //fetch list on mount
+
+
+  useEffect(() => {
     setCreateIsDisabled(invalidSelectedStore);
     setEditIsDisabled(invalidSelectedStore);
   }, [selectedAddress, selectedName]);

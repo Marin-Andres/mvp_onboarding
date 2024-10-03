@@ -23,6 +23,9 @@ const ProductTable = () => {
 
   useEffect(() => {
     fetchProducts();
+  }, []); //fetch list on mount
+
+  useEffect(() => {
     setCreateIsDisabled(invalidSelectedProduct);
     setEditIsDisabled(invalidSelectedProduct);
   }, [selectedPrice, selectedName]);
@@ -123,10 +126,10 @@ const ProductTable = () => {
       return true;
     }
     if (selectedPrice === "") {
-        return true;
+      return true;
     }
     if (isNaN(selectedPrice)) {
-        return true;
+      return true;
     }
     if (selectedPrice < 0) {
       return true;
