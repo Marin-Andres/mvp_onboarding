@@ -6,6 +6,9 @@ using mvp_onboarding.Server.Classes;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -25,6 +28,8 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseExceptionHandler("/error");
+app.UseHsts();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
