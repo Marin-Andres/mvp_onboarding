@@ -24,7 +24,20 @@ builder.Services.AddScoped<ISalesViewMethods, SalesViewMethods>();
 builder.Services.AddDbContext<TalentOnboardingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Onboarding")));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowViteLocalhost",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:5173")  
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowViteLocalhost");
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
