@@ -1,9 +1,16 @@
 import api from './api';
 
 // Get all customers
-export const getCustomers = async () => {
+export const getCustomers = async (pageNumber, pageSize, sortColumn, sortDirection) => {
   try {
-    const response = await api.get('/Customer');
+    const response = await api.get('/Customer', {
+      params: {
+        pageNumber,
+        pageSize,
+        sortColumn,
+        sortDirection,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error getting customers:', error);

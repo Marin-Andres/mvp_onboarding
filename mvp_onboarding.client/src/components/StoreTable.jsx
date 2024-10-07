@@ -6,7 +6,9 @@ import {
   Icon,
   Modal,
   Form,
-  Input
+  Input,
+  Pagination,
+  Dropdown
 } from "semantic-ui-react";
 
 const StoreTable = () => {
@@ -21,9 +23,26 @@ const StoreTable = () => {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [selectedName, setSelectedName] = useState("");
 
+  const [sortColumn, setSortColumn] = useState('Name');
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pageSizeOptions = [
+    { key: 10, text: '10', value: 10 },
+    { key: 20, text: '20', value: 20 },
+    { key: 50, text: '50', value: 50 },
+  ];
+
+  const handleSort = (column, direction) => {
+    setSortColumn(column);
+    setSortDirection(direction);
+  }
+
   useEffect(() => {
-    fetchStores();
-  }, []); //fetch list on mount
+    fetchStores(currentPage, pageSize, sortColumn, sortDirection);
+  }, [currentPage, pageSize, sortColumn, sortDirection]);
 
 
   useEffect(() => {
@@ -31,11 +50,12 @@ const StoreTable = () => {
     setEditIsDisabled(invalidSelectedStore);
   }, [selectedAddress, selectedName]);
 
-  const fetchStores = async () => {
+  const fetchStores = async (currentPage, pageSize, sortColumn, sortDirection) => {
     try {
-      const data = await getStores();
-      if (data?.length > 0) {
-        setStores(data);
+      const data = await getStores(currentPage, pageSize, sortColumn, sortDirection);
+      if (data?.items?.length > 0) {
+        setStores(data?.items);
+        setTotalCount(data?.totalCount);
       }
     } catch (error) {
       console.error("Failed to fetch stores", error);
@@ -132,6 +152,15 @@ const StoreTable = () => {
     return false;
   }
 
+  const handlePageChange = (e, { activePage }) => {
+    setCurrentPage(activePage);
+  };
+
+  const handlePageSizeChange = (e, { value }) => {
+    setPageSize(value);
+    setCurrentPage(1); // Reset to first page on page size change
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -142,8 +171,34 @@ const StoreTable = () => {
       <Table className="ui celled table" striped>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Address</Table.HeaderCell>
+            <Table.HeaderCell>
+              Name
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Name' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Name', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Name' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Name', 'asc')}
+              />
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              Address
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Address' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Address', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Address' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Address', 'asc')}
+              />
+            </Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
           </Table.Row>
@@ -168,6 +223,25 @@ const StoreTable = () => {
           ))}
         </Table.Body>
       </Table>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Dropdown
+          compact
+          selection
+          options={pageSizeOptions}
+          value={pageSize}
+          onChange={handlePageSizeChange}
+        />
+        <Pagination
+          activePage={currentPage}
+          totalPages={Math.ceil(totalCount / pageSize)}
+          onPageChange={handlePageChange}
+          ellipsisItem={null}
+          prevItem={null}
+          nextItem={null}
+          firstItem={null}
+          lastItem={null}
+        />
+      </div>
 
       {/* modal window for delete store */}
       <Modal

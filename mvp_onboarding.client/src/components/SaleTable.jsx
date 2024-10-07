@@ -11,7 +11,8 @@ import {
   Icon,
   Modal,
   Form,
-  Input
+  Pagination,
+  Dropdown
 } from "semantic-ui-react";
 
 const SaleTable = () => {
@@ -32,12 +33,29 @@ const SaleTable = () => {
   const [products, setProducts] = useState([]);
   const [stores, setStores] = useState([]);
 
+  const [sortColumn, setSortColumn] = useState('Customer');
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pageSizeOptions = [
+    { key: 10, text: '10', value: 10 },
+    { key: 20, text: '20', value: 20 },
+    { key: 50, text: '50', value: 50 },
+  ];
+
+  const handleSort = (column, direction) => {
+    setSortColumn(column);
+    setSortDirection(direction);
+  }
+
   useEffect(() => {
-    fetchSales();
+    fetchSales(currentPage, pageSize, sortColumn, sortDirection);
     fetchCustomers();
     fetchStores();
     fetchProducts();
-  }, []); //fetch list on mount
+  }, [currentPage, pageSize, sortColumn, sortDirection]); //fetch list on mount
 
 
   useEffect(() => {
@@ -45,11 +63,12 @@ const SaleTable = () => {
     setEditIsDisabled(invalidSelectedSale);
   }, [selectedCustomer, selectedStore, selectedProduct]);
 
-  const fetchSales = async () => {
+  const fetchSales = async (currentPage, pageSize, sortColumn, sortDirection) => {
     try {
-      const data = await getSalesView();
-      if (data?.length > 0) {
-        setSales(data);
+      const data = await getSalesView(currentPage, pageSize, sortColumn, sortDirection);
+      if (data?.items?.length > 0) {
+        setSales(data?.items);
+        setTotalCount(data?.totalCount);
       }
     } catch (error) {
       console.error("Failed to fetch sales", error);
@@ -72,9 +91,9 @@ const SaleTable = () => {
 
   const fetchCustomers = async () => {
     try {
-      const data = await getCustomers();
-      if (data?.length > 0) {
-        setCustomers(data);
+      const data = await getCustomers(1, 1000, "Name", "asc");
+      if (data?.items?.length > 0) {
+        setCustomers(data?.items);
       }
     } catch (error) {
       console.error("Failed to fetch customers", error);
@@ -83,9 +102,9 @@ const SaleTable = () => {
 
   const fetchStores = async () => {
     try {
-      const data = await getStores();
-      if (data?.length > 0) {
-        setStores(data);
+      const data = await getStores(1, 1000, "Name", "asc");
+      if (data?.items?.length > 0) {
+        setStores(data?.items);
       }
     } catch (error) {
       console.error("Failed to fetch stores", error);
@@ -94,9 +113,9 @@ const SaleTable = () => {
 
   const fetchProducts = async () => {
     try {
-      const data = await getProducts();
-      if (data?.length > 0) {
-        setProducts(data);
+      const data = await getProducts(1, 1000, "Name", "asc");
+      if (data?.items?.length > 0) {
+        setProducts(data?.items);
       }
     } catch (error) {
       console.error("Failed to fetch products", error);
@@ -128,7 +147,7 @@ const SaleTable = () => {
     if (newSale) {
       try {
         await updateSale(selectedSaleView.id, newSale);
-        fetchSales();
+        fetchSales(currentPage, pageSize, sortColumn, sortDirection);
       }
       catch (error) {
         console.error("Failed to update sale", error);
@@ -149,7 +168,7 @@ const SaleTable = () => {
     if (newSale) {
       try {
         await createSale(newSale);
-        fetchSales();
+        fetchSales(currentPage, pageSize, sortColumn, sortDirection);
       }
       catch (error) {
         console.error("Failed to add new sale", error);
@@ -224,6 +243,15 @@ const SaleTable = () => {
     return false;
   };
 
+  const handlePageChange = (e, { activePage }) => {
+    setCurrentPage(activePage);
+  };
+
+  const handlePageSizeChange = (e, { value }) => {
+    setPageSize(value);
+    setCurrentPage(1); // Reset to first page on page size change
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -234,10 +262,62 @@ const SaleTable = () => {
       <Table className="ui celled table" striped>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Customer</Table.HeaderCell>
-            <Table.HeaderCell>Product</Table.HeaderCell>
-            <Table.HeaderCell>Store</Table.HeaderCell>
-            <Table.HeaderCell>Date Sold</Table.HeaderCell>
+            <Table.HeaderCell>
+              Customer
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Customer' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Customer', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Customer' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Customer', 'asc')}
+              />
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              Product
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Product' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Product', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Product' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Product', 'asc')}
+              />
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              Store
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Store' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Store', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Store' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Store', 'asc')}
+              />
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              Date Sold
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'DateSold' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('DateSold', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'DateSold' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('DateSold', 'asc')}
+              />
+            </Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
           </Table.Row>
@@ -264,6 +344,25 @@ const SaleTable = () => {
           ))}
         </Table.Body>
       </Table>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Dropdown
+          compact
+          selection
+          options={pageSizeOptions}
+          value={pageSize}
+          onChange={handlePageSizeChange}
+        />
+        <Pagination
+          activePage={currentPage}
+          totalPages={Math.ceil(totalCount / pageSize)}
+          onPageChange={handlePageChange}
+          ellipsisItem={null}
+          prevItem={null}
+          nextItem={null}
+          firstItem={null}
+          lastItem={null}
+        />
+      </div>
 
       {/* modal window for delete sale */}
       <Modal

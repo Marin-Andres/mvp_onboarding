@@ -6,7 +6,9 @@ import {
   Icon,
   Modal,
   Form,
-  Input
+  Input,
+  Pagination,
+  Dropdown
 } from "semantic-ui-react";
 
 const ProductTable = () => {
@@ -21,20 +23,38 @@ const ProductTable = () => {
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedName, setSelectedName] = useState("");
 
+  const [sortColumn, setSortColumn] = useState('Name');
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pageSizeOptions = [
+    { key: 10, text: '10', value: 10 },
+    { key: 20, text: '20', value: 20 },
+    { key: 50, text: '50', value: 50 },
+  ];
+
+  const handleSort = (column, direction) => {
+    setSortColumn(column);
+    setSortDirection(direction);
+  }
+
   useEffect(() => {
-    fetchProducts();
-  }, []); //fetch list on mount
+    fetchProducts(currentPage, pageSize, sortColumn, sortDirection);
+  }, [currentPage, pageSize, sortColumn, sortDirection]);
 
   useEffect(() => {
     setCreateIsDisabled(invalidSelectedProduct);
     setEditIsDisabled(invalidSelectedProduct);
   }, [selectedPrice, selectedName]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (currentPage, pageSize, sortColumn, sortDirection) => {
     try {
-      const data = await getProducts();
-      if (data?.length > 0) {
-        setProducts(data);
+      const data = await getProducts(currentPage, pageSize, sortColumn, sortDirection);
+      if (data?.items?.length > 0) {
+        setProducts(data?.items);
+        setTotalCount(data?.totalCount);
       }
     } catch (error) {
       console.error("Failed to fetch products", error);
@@ -137,6 +157,16 @@ const ProductTable = () => {
     return false;
   }
 
+
+  const handlePageChange = (e, { activePage }) => {
+    setCurrentPage(activePage);
+  };
+
+  const handlePageSizeChange = (e, { value }) => {
+    setPageSize(value);
+    setCurrentPage(1); // Reset to first page on page size change
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -147,8 +177,34 @@ const ProductTable = () => {
       <Table className="ui celled table" striped>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Price</Table.HeaderCell>
+            <Table.HeaderCell>
+              Name
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Name' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Name', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Name' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Name', 'asc')}
+              />
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+              Price
+              &nbsp;
+              <Icon
+                name={'fitted caret down'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Price' && sortDirection === 'desc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Price', 'desc')}
+              />
+              <Icon
+                name={'fitted caret up'}
+                style={{ cursor: 'pointer', opacity: sortColumn === 'Price' && sortDirection === 'asc' ? 1 : 0.5 }}
+                onClick={() => handleSort('Price', 'asc')}
+              />
+            </Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
           </Table.Row>
@@ -173,6 +229,25 @@ const ProductTable = () => {
           ))}
         </Table.Body>
       </Table>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Dropdown
+          compact
+          selection
+          options={pageSizeOptions}
+          value={pageSize}
+          onChange={handlePageSizeChange}
+        />
+        <Pagination
+          activePage={currentPage}
+          totalPages={Math.ceil(totalCount / pageSize)}
+          onPageChange={handlePageChange}
+          ellipsisItem={null}
+          prevItem={null}
+          nextItem={null}
+          firstItem={null}
+          lastItem={null}
+        />
+      </div>
 
       {/* modal window for delete product */}
       <Modal

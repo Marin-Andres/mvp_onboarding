@@ -1,9 +1,16 @@
 import api from './api';
 
 // Get all products
-export const getProducts = async () => {
+export const getProducts = async (pageNumber, pageSize, sortColumn, sortDirection) => {
   try {
-    const response = await api.get('/Product');
+    const response = await api.get('/Product', {
+      params: {
+        pageNumber,
+        pageSize,
+        sortColumn,
+        sortDirection,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error getting products:', error);
