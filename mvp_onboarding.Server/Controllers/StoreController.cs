@@ -17,16 +17,20 @@ namespace mvp_onboarding.Server.Controllers
 
         // GET: api/Store
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StoreDto>>> GetStores()
+        public async Task<ActionResult<StoreResponseDto>> GetStores(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string sortColumn = "Name",
+            [FromQuery] string sortDirection = "asc")
         {
-            var stores = await _storeMethods.GetStores();
-            if (stores.Count() < 1)
+            var storeResponse = await _storeMethods.GetStores(pageNumber, pageSize, sortColumn, sortDirection);
+            if (storeResponse.TotalCount < 1)
             {
                 return NotFound();
             }
             else
             {
-                return Ok(stores);
+                return Ok(storeResponse);
             }
         }
 

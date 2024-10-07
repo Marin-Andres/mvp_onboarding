@@ -15,11 +15,42 @@ namespace mvp_onboarding.Server.Classes
 
         private readonly TalentOnboardingContext _context;
 
-        public async Task<IEnumerable<CustomerDto>> GetCustomers()
+        public async Task<CustomerResponseDto> GetCustomers(int pageNumber, int pageSize, string sortColumn, string sortDirection)
         {
-            var _customers = await _context.Customers.Select(c => CustomerMapper.EntityToDto(c)).ToListAsync();
+            var query = _context.Customers.AsQueryable();
 
-            return (_customers);
+            try
+            {
+                if (sortDirection.ToLower() == "asc")
+                {
+                    query = query.OrderBy(c => EF.Property<Customer>(c, sortColumn));
+                }
+                else
+                {
+                    query = query.OrderByDescending(c => EF.Property<Customer>(c, sortColumn));
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            var totalCount = await query.CountAsync();
+            var customers = await query
+                .Skip((pageNumber -1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var customerDtos = customers.Select(c => CustomerMapper.EntityToDto(c)).ToList();
+
+            return new CustomerResponseDto
+            {
+                Items = customerDtos,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
+            
         }
 
         public async Task<CustomerDto> GetCustomer(int id)

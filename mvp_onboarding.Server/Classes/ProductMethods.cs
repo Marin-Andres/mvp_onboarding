@@ -15,11 +15,41 @@ namespace mvp_onboarding.Server.Classes
 
         private readonly TalentOnboardingContext _context;
 
-        public async Task<IEnumerable<ProductDto>> GetProducts()
+        public async Task<ProductResponseDto> GetProducts(int pageNumber, int pageSize, string sortColumn, string sortDirection)
         {
-            var _products = await _context.Products.Select(c => ProductMapper.EntityToDto(c)).ToListAsync();
+            var query = _context.Products.AsQueryable();
 
-            return (_products);
+            try
+            {
+                if (sortDirection.ToLower() == "asc")
+                {
+                    query = query.OrderBy(c => EF.Property<Product>(c, sortColumn));
+                }
+                else
+                {
+                    query = query.OrderByDescending(c => EF.Property<Product>(c, sortColumn));
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            var totalCount = await query.CountAsync();
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDtos = products.Select(c => ProductMapper.EntityToDto(c)).ToList();
+
+            return new ProductResponseDto
+            {
+                Items = productDtos,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
         }
 
         public async Task<ProductDto> GetProduct(int id)

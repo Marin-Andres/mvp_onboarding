@@ -15,11 +15,41 @@ namespace mvp_onboarding.Server.Classes
 
         private readonly TalentOnboardingContext _context;
 
-        public async Task<IEnumerable<StoreDto>> GetStores()
+        public async Task<StoreResponseDto> GetStores(int pageNumber, int pageSize, string sortColumn, string sortDirection)
         {
-            var _stores = await _context.Stores.Select(c => StoreMapper.EntityToDto(c)).ToListAsync();
+            var query = _context.Stores.AsQueryable();
 
-            return (_stores);
+            try
+            {
+                if (sortDirection.ToLower() == "asc")
+                {
+                    query = query.OrderBy(c => EF.Property<Store>(c, sortColumn));
+                }
+                else
+                {
+                    query = query.OrderByDescending(c => EF.Property<Store>(c, sortColumn));
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            var totalCount = await query.CountAsync();
+            var stores = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var storeDtos = stores.Select(c => StoreMapper.EntityToDto(c)).ToList();
+
+            return new StoreResponseDto
+            {
+                Items = storeDtos,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
         }
 
         public async Task<StoreDto> GetStore(int id)

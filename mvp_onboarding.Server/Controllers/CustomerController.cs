@@ -17,16 +17,20 @@ namespace mvp_onboarding.Server.Controllers
 
         // GET: api/Customer
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetCustomers()
+        public async Task<ActionResult<CustomerResponseDto>> GetCustomers(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string sortColumn = "Name",
+            [FromQuery] string sortDirection = "asc")
         {
-            var customers = await _customerMethods.GetCustomers();
-            if (customers.Count() < 1)
+            var customerResponse = await _customerMethods.GetCustomers(pageNumber, pageSize, sortColumn, sortDirection);
+            if (customerResponse.TotalCount < 1)
             {
                 return NotFound();
             }
             else
             {
-                return Ok(customers);
+                return Ok(customerResponse);
             }
         }
 
