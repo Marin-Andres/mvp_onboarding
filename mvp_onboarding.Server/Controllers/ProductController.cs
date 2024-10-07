@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using mvp_onboarding.Server.Interfaces;
 using mvp_onboarding.Server.Dtos;
+using System.Drawing.Printing;
 
 namespace mvp_onboarding.Server.Controllers
 {
@@ -17,16 +18,20 @@ namespace mvp_onboarding.Server.Controllers
 
         // GET: api/Product
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+        public async Task<ActionResult<ProductResponseDto>> GetProducts(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string sortColumn = "Name",
+            [FromQuery] string sortDirection = "asc")
         {
-            var products = await _productMethods.GetProducts();
-            if (products.Count() < 1)
+            var productResponse = await _productMethods.GetProducts(pageNumber, pageSize, sortColumn, sortDirection);
+            if (productResponse.TotalCount < 1)
             {
                 return NotFound();
             }
             else
             {
-                return Ok(products);
+                return Ok(productResponse);
             }
         }
 

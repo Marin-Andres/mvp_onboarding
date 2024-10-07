@@ -8,7 +8,7 @@ namespace mvp_onboarding.Server.Interfaces
         Task<ProductDto> UpdateProduct(int id, ProductUpdateDto productDto);
         Task<ProductDto> DeleteProduct(int id);
         Task<ProductDto> GetProduct(int id);
-        Task<IEnumerable<ProductDto>> GetProducts();
+        Task<ProductResponseDto> GetProducts(int pageNumber, int pageSize, string sortColumn, string sortDirection);
         public bool ProductExists(int id);
     }
 }

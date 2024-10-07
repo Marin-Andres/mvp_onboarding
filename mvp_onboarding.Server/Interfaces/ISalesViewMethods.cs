@@ -4,6 +4,6 @@ namespace mvp_onboarding.Server.Interfaces
 {
     public interface ISalesViewMethods
     {
-        Task<IEnumerable<SalesViewDto>> GetSales();
+        Task<SalesViewResponseDto> GetSales(int pageNumber, int pageSize, string sortColumn, string sortDirection);
     }
 }
