@@ -17,10 +17,10 @@ namespace mvp_onboarding.Server.Classes
 
         public async Task<StoreResponseDto> GetStores(int pageNumber, int pageSize, string sortColumn, string sortDirection)
         {
-            var query = _context.Stores.AsQueryable();
-
             try
             {
+                var query = _context.Stores.AsQueryable();
+
                 if (sortDirection.ToLower() == "asc")
                 {
                     query = query.OrderBy(c => EF.Property<Store>(c, sortColumn));
@@ -29,59 +29,84 @@ namespace mvp_onboarding.Server.Classes
                 {
                     query = query.OrderByDescending(c => EF.Property<Store>(c, sortColumn));
                 }
+
+                var totalCount = await query.CountAsync();
+                var stores = await query
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var storeDtos = stores.Select(c => StoreMapper.EntityToDto(c)).ToList();
+
+                return new StoreResponseDto
+                {
+                    Items = storeDtos,
+                    TotalCount = totalCount,
+                    PageSize = pageSize,
+                    CurrentPage = pageNumber
+                };
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine(ex.Message);
+
+                return new StoreResponseDto
+                {
+                    Items = new List<StoreDto>(),
+                    TotalCount = 0,
+                    PageSize = pageSize,
+                    CurrentPage = pageNumber
+                };
             }
 
-            var totalCount = await query.CountAsync();
-            var stores = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var storeDtos = stores.Select(c => StoreMapper.EntityToDto(c)).ToList();
-
-            return new StoreResponseDto
-            {
-                Items = storeDtos,
-                TotalCount = totalCount,
-                PageSize = pageSize,
-                CurrentPage = pageNumber
-            };
         }
 
-        public async Task<StoreDto> GetStore(int id)
+        public async Task<StoreDto> GetStore(int? id)
         {
-            var store = await _context.Stores.FindAsync(id);
-            if (store == null)
+            try
             {
+                if (id == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    var store = await _context.Stores.FindAsync(id);
+                    if (store == null)
+                    {
+                        return null;
+                    }
+                    return StoreMapper.EntityToDto(store);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+
                 return null;
             }
-            return StoreMapper.EntityToDto(store);
+
         }
         public async Task<StoreDto> AddStore(StoreDto storeDto)
         {
-            var store = StoreMapper.DtoToEntity(storeDto);
-
-            _context.Add(store);
-            await _context.SaveChangesAsync();
-
-            return StoreMapper.EntityToDto(store);
-        }
-        public async Task<StoreDto> UpdateStore(int id, StoreUpdateDto storeDto)
-        {
-
-            var store = StoreMapper.DtoToEntity(storeDto);
-
-            _context.Entry(store).State = EntityState.Modified;
-
             try
             {
+                var store = StoreMapper.DtoToEntity(storeDto);
+
+                _context.Add(store);
                 await _context.SaveChangesAsync();
+
+                return StoreMapper.EntityToDto(store);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}");
+                return null;
+            }
+        }
+        public async Task<StoreDto> UpdateStore(int? id, StoreUpdateDto storeDto)
+        {
+            try
             {
                 if (!StoreExists(id))
                 {
@@ -89,29 +114,57 @@ namespace mvp_onboarding.Server.Classes
                 }
                 else
                 {
-                    throw;
+                    var store = StoreMapper.DtoToEntity(storeDto);
+
+                    _context.Entry(store).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    return StoreMapper.EntityToDto(store);
                 }
             }
-
-            return StoreMapper.EntityToDto(store);
-
-        }
-        public async Task<StoreDto> DeleteStore(int id)
-        {
-            var store = await _context.Stores.FindAsync(id);
-            if (store == null)
+            catch (Exception ex)
             {
+                Console.WriteLine (ex.ToString());
                 return null;
             }
-
-            _context.Stores.Remove(store);
-            await _context.SaveChangesAsync();
-
-            return StoreMapper.EntityToDto(store);
         }
-        public bool StoreExists(int id)
+        public async Task<StoreDto> DeleteStore(int? id)
         {
-            return _context.Stores.Any(e => e.Id == id);
+            try
+            {
+                if (id == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    var store = await _context.Stores.FindAsync(id);
+                    if (store == null)
+                    {
+                        return null;
+                    }
+
+                    _context.Stores.Remove(store);
+                    await _context.SaveChangesAsync();
+
+                    return StoreMapper.EntityToDto(store);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+        public bool StoreExists(int? id)
+        {
+            if (id == null)
+            {
+                return false;
+            }
+            else
+            {
+                return _context.Stores.Any(e => e.Id == id);
+            }
         }
     }
 }

@@ -17,41 +17,63 @@ namespace mvp_onboarding.Server.Classes
 
         public async Task<IEnumerable<SaleDto>> GetSales()
         {
-            var _sales = await _context.Sales.Select(c => SaleMapper.EntityToDto(c)).ToListAsync();
+            try
+            {
+                var _sales = await _context.Sales.Select(c => SaleMapper.EntityToDto(c)).ToListAsync();
 
-            return (_sales);
+                return (_sales);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return Enumerable.Empty<SaleDto>();
+            }
         }
 
-        public async Task<SaleDto> GetSale(int id)
+        public async Task<SaleDto> GetSale(int? id)
         {
-            var sale = await _context.Sales.FindAsync(id);
-            if (sale == null)
+            try
             {
+                if (id == null)
+                {
+                    return null;
+                }
+                else
+                { 
+                    var sale = await _context.Sales.FindAsync(id);
+                    if (sale == null)
+                    {
+                        return null;
+                    }
+                    return SaleMapper.EntityToDto(sale);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
                 return null;
             }
-            return SaleMapper.EntityToDto(sale);
         }
         public async Task<SaleDto> AddSale(SaleDto saleDto)
         {
-            var sale = SaleMapper.DtoToEntity(saleDto);
-
-            _context.Add(sale);
-            await _context.SaveChangesAsync();
-
-            return SaleMapper.EntityToDto(sale);
-        }
-        public async Task<SaleDto> UpdateSale(int id, SaleUpdateDto saleDto)
-        {
-
-            var sale = SaleMapper.DtoToEntity(saleDto);
-
-            _context.Entry(sale).State = EntityState.Modified;
-
             try
             {
+                var sale = SaleMapper.DtoToEntity(saleDto);
+
+                _context.Add(sale);
                 await _context.SaveChangesAsync();
+
+                return SaleMapper.EntityToDto(sale);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+        public async Task<SaleDto> UpdateSale(int? id, SaleUpdateDto saleDto)
+        {
+            try
             {
                 if (!SaleExists(id))
                 {
@@ -59,29 +81,57 @@ namespace mvp_onboarding.Server.Classes
                 }
                 else
                 {
-                    throw;
+                    var sale = SaleMapper.DtoToEntity(saleDto);
+
+                    _context.Entry(sale).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                    return SaleMapper.EntityToDto(sale);
                 }
             }
-
-            return SaleMapper.EntityToDto(sale);
-
-        }
-        public async Task<SaleDto> DeleteSale(int id)
-        {
-            var sale = await _context.Sales.FindAsync(id);
-            if (sale == null)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return null;
             }
-
-            _context.Sales.Remove(sale);
-            await _context.SaveChangesAsync();
-
-            return SaleMapper.EntityToDto(sale);
         }
-        public bool SaleExists(int id)
+        public async Task<SaleDto> DeleteSale(int? id)
         {
-            return _context.Sales.Any(e => e.Id == id);
+            try
+            {
+                if (id == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    var sale = await _context.Sales.FindAsync(id);
+                    if (sale == null)
+                    {
+                        return null;
+                    }
+
+                    _context.Sales.Remove(sale);
+                    await _context.SaveChangesAsync();
+
+                    return SaleMapper.EntityToDto(sale);
+                }
+            }
+            catch (Exception e)
+            { 
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+        public bool SaleExists(int? id)
+        {
+            if (id == null)
+            {
+                return false;
+            }
+            else
+            {
+                return _context.Sales.Any(e => e.Id == id);
+            }
         }
     }
 }
