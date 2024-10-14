@@ -14,8 +14,13 @@ export const getSales = async () => {
 // Get sale 
 export const getSale = async (id) => {
   try {
-    const response = await api.get(`/Sale/${id}`);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid sale id.";
+    }
+    else {    
+      const response = await api.get(`/Sale/${id}`);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error getting sale with ID ${id}:`, error);
     throw error;
@@ -36,8 +41,13 @@ export const createSale = async (saleData) => {
 // Update sale
 export const updateSale = async (id, saleData) => {
   try {
-    const response = await api.put(`/Sale/${id}`, saleData);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid sale id.";
+    }
+    else {    
+      const response = await api.put(`/Sale/${id}`, saleData);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error updating sale with ID ${id}:`, error);
     throw error;
@@ -47,8 +57,13 @@ export const updateSale = async (id, saleData) => {
 // Delete sale
 export const deleteSale = async (id) => {
   try {
-    const response = await api.delete(`/Sale/${id}`);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid sale id.";
+    }
+    else {    
+      const response = await api.delete(`/Sale/${id}`);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error deleting sale with ID ${id}:`, error);
     throw error;

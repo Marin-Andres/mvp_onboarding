@@ -40,15 +40,6 @@ const CustomerTable = () => {
     setSortDirection(direction);
   }
 
-  useEffect(() => {
-    fetchCustomers(currentPage, pageSize, sortColumn, sortDirection);
-  }, [currentPage, pageSize, sortColumn, sortDirection]);
-
-  useEffect(() => {
-    setCreateIsDisabled(invalidSelectedCustomer);
-    setEditIsDisabled(invalidSelectedCustomer);
-  }, [selectedAddress, selectedName]);
-
   const fetchCustomers = async (currentPage, pageSize, sortColumn, sortDirection) => {
     try {
       const data = await getCustomers(currentPage, pageSize, sortColumn, sortDirection);
@@ -62,52 +53,61 @@ const CustomerTable = () => {
       setLoading(false);
     }
   };
+  
   const handleDelete = async () => {
-    if (selectedCustomer) {
-      try {
+    try {
+      if (selectedCustomer && selectedCustomer?.id) {
         await deleteCustomer(selectedCustomer?.id);
         setCustomers(customers.filter((customer) => customer.id !== selectedCustomer?.id));
-        setDeleteOpen(false);
       }
-      catch (error) {
-        console.error("Failed to delete customer", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to delete customer", error);
+    }
+    finally {
+      setDeleteOpen(false);
     }
   };
 
   const handleEditSubmit = async () => {
-    let newCustomer = {
-      id: selectedCustomer.id,
-      name: selectedName,
-      address: selectedAddress
-    };
-    if (newCustomer) {
-      try {
+    try {
+      let newCustomer = {
+        id: selectedCustomer.id,
+        name: selectedName,
+        address: selectedAddress
+      };
+
+      if (newCustomer && newCustomer?.id) {
         await updateCustomer(selectedCustomer.id, newCustomer);
         fetchCustomers(currentPage, pageSize, sortColumn, sortDirection);
       }
-      catch (error) {
-        console.error("Failed to update customer", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to update customer", error);
+    }
+    finally {
       setEditOpen(false);
     }
+  };
 
-  }
   const handleNewSubmit = async () => {
-    let newCustomer = {
-      id: "0",
-      name: selectedName,
-      address: selectedAddress
-    };
-    setSelectedCustomer(newCustomer);
-    if (newCustomer) {
-      try {
+    try {
+      let newCustomer = {
+        id: "0",
+        name: selectedName,
+        address: selectedAddress
+      };
+      setSelectedCustomer(newCustomer);
+      
+      if (newCustomer) {
         await createCustomer(newCustomer);
         fetchCustomers(currentPage, pageSize, sortColumn, sortDirection);
-      }
-      catch (error) {
-        console.error("Failed to add new customer", error);
-      }
+        }
+    }
+    catch (error) {
+      console.error("Failed to add new customer", error);
+    }
+    finally {
       setNewOpen(false);
     }
   };
@@ -142,10 +142,7 @@ const CustomerTable = () => {
   };
 
   const invalidSelectedCustomer = () => {
-    if (selectedName === "") {
-      return true;
-    }
-    if (selectedAddress === "") {
+    if ((selectedName === "") || (selectedAddress === "")) {
       return true;
     }
     return false;
@@ -159,6 +156,15 @@ const CustomerTable = () => {
     setPageSize(value);
     setCurrentPage(1); // Reset to first page on page size change
   };
+
+  useEffect(() => {
+    fetchCustomers(currentPage, pageSize, sortColumn, sortDirection);
+  }, [currentPage, pageSize, sortColumn, sortDirection]);
+
+  useEffect(() => {
+    setCreateIsDisabled(invalidSelectedCustomer);
+    setEditIsDisabled(invalidSelectedCustomer);
+  }, [selectedAddress, selectedName]);
 
   if (loading) return <p>Loading...</p>;
 

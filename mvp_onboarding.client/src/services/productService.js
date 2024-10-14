@@ -21,8 +21,13 @@ export const getProducts = async (pageNumber, pageSize, sortColumn, sortDirectio
 // Get product 
 export const getProduct = async (id) => {
   try {
-    const response = await api.get(`/Product/${id}`);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid product id.";
+    }
+    else {
+      const response = await api.get(`/Product/${id}`);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error getting product with ID ${id}:`, error);
     throw error;
@@ -43,8 +48,13 @@ export const createProduct = async (productData) => {
 // Update product
 export const updateProduct = async (id, productData) => {
   try {
-    const response = await api.put(`/Product/${id}`, productData);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid product id.";
+    }
+    else {
+      const response = await api.put(`/Product/${id}`, productData);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error updating product with ID ${id}:`, error);
     throw error;
@@ -54,8 +64,13 @@ export const updateProduct = async (id, productData) => {
 // Delete product
 export const deleteProduct = async (id) => {
   try {
-    const response = await api.delete(`/Product/${id}`);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid product id.";
+    }
+    else {
+      const response = await api.delete(`/Product/${id}`);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error deleting product with ID ${id}:`, error);
     throw error;

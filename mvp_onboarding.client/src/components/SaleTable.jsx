@@ -50,19 +50,6 @@ const SaleTable = () => {
     setSortDirection(direction);
   }
 
-  useEffect(() => {
-    fetchSales(currentPage, pageSize, sortColumn, sortDirection);
-    fetchCustomers();
-    fetchStores();
-    fetchProducts();
-  }, [currentPage, pageSize, sortColumn, sortDirection]); //fetch list on mount
-
-
-  useEffect(() => {
-    setCreateIsDisabled(invalidSelectedSale);
-    setEditIsDisabled(invalidSelectedSale);
-  }, [selectedCustomer, selectedStore, selectedProduct]);
-
   const fetchSales = async (currentPage, pageSize, sortColumn, sortDirection) => {
     try {
       const data = await getSalesView(currentPage, pageSize, sortColumn, sortDirection);
@@ -123,56 +110,64 @@ const SaleTable = () => {
   };
 
   const handleDelete = async () => {
-    if (selectedSaleView) {
+    if (selectedSaleView && selectedSaleView?.id) {
       try {
         await deleteSale(selectedSaleView?.id);
         setSales(sales.filter((sale) => sale.id !== selectedSaleView?.id));
-        setDeleteOpen(false);
       }
       catch (error) {
         console.error("Failed to delete sale", error);
+      }
+      finally {
+        setDeleteOpen(false);
       }
     }
   };
 
   const handleEditSubmit = async () => {
-    let dateOnly = soldDate.toISOString().slice(0, 10);
-    let newSale = {
-      id: selectedSaleView.id,
-      customerId: selectedCustomer,
-      productId: selectedProduct,
-      storeId: selectedStore,
-      dateSold: dateOnly
-    };
-    if (newSale) {
-      try {
+    try {
+      let dateOnly = soldDate.toISOString().slice(0, 10);
+      let newSale = {
+        id: selectedSaleView.id,
+        customerId: selectedCustomer,
+        productId: selectedProduct,
+        storeId: selectedStore,
+        dateSold: dateOnly
+      };
+
+      if (newSale && newSale?.id) {
         await updateSale(selectedSaleView.id, newSale);
         fetchSales(currentPage, pageSize, sortColumn, sortDirection);
       }
-      catch (error) {
-        console.error("Failed to update sale", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to update sale", error);
+    }
+    finally {
       setEditOpen(false);
     }
+  };
 
-  }
   const handleNewSubmit = async () => {
-    let dateOnly = soldDate.toISOString().slice(0, 10);
-    let newSale = {
-      id: "0",
-      customerId: selectedCustomer,
-      productId: selectedProduct,
-      storeId: selectedStore,
-      dateSold: dateOnly
-    };
-    if (newSale) {
-      try {
-        await createSale(newSale);
-        fetchSales(currentPage, pageSize, sortColumn, sortDirection);
+    try {
+      let dateOnly = soldDate.toISOString().slice(0, 10);
+      let newSale = {
+        id: "0",
+        customerId: selectedCustomer,
+        productId: selectedProduct,
+        storeId: selectedStore,
+        dateSold: dateOnly
+      };
+
+      if (newSale) {
+      await createSale(newSale);
+      fetchSales(currentPage, pageSize, sortColumn, sortDirection);
       }
-      catch (error) {
-        console.error("Failed to add new sale", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to add new sale", error);
+    }
+    finally {
       setNewOpen(false);
     }
   };
@@ -251,6 +246,19 @@ const SaleTable = () => {
     setPageSize(value);
     setCurrentPage(1); // Reset to first page on page size change
   };
+
+  useEffect(() => {
+    fetchSales(currentPage, pageSize, sortColumn, sortDirection);
+    fetchCustomers();
+    fetchStores();
+    fetchProducts();
+  }, [currentPage, pageSize, sortColumn, sortDirection]); //fetch list on mount
+
+
+  useEffect(() => {
+    setCreateIsDisabled(invalidSelectedSale);
+    setEditIsDisabled(invalidSelectedSale);
+  }, [selectedCustomer, selectedStore, selectedProduct]);
 
   if (loading) return <p>Loading...</p>;
 

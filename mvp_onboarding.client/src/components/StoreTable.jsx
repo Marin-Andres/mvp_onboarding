@@ -40,16 +40,6 @@ const StoreTable = () => {
     setSortDirection(direction);
   }
 
-  useEffect(() => {
-    fetchStores(currentPage, pageSize, sortColumn, sortDirection);
-  }, [currentPage, pageSize, sortColumn, sortDirection]);
-
-
-  useEffect(() => {
-    setCreateIsDisabled(invalidSelectedStore);
-    setEditIsDisabled(invalidSelectedStore);
-  }, [selectedAddress, selectedName]);
-
   const fetchStores = async (currentPage, pageSize, sortColumn, sortDirection) => {
     try {
       const data = await getStores(currentPage, pageSize, sortColumn, sortDirection);
@@ -63,52 +53,61 @@ const StoreTable = () => {
       setLoading(false);
     }
   };
+
   const handleDelete = async () => {
-    if (selectedStore) {
-      try {
+    try {
+      if (selectedStore && selectedStore?.id) {
         await deleteStore(selectedStore?.id);
         setStores(stores.filter((store) => store.id !== selectedStore?.id));
-        setDeleteOpen(false);
       }
-      catch (error) {
-        console.error("Failed to delete store", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to delete store", error);
+    }
+    finally {
+      setDeleteOpen(false);
     }
   };
 
   const handleEditSubmit = async () => {
-    let newStore = {
-      id: selectedStore.id,
-      name: selectedName,
-      address: selectedAddress
-    };
-    if (newStore) {
-      try {
+    try {
+      let newStore = {
+        id: selectedStore.id,
+        name: selectedName,
+        address: selectedAddress
+      };
+
+      if (newStore && newStore?.id) {
         await updateStore(selectedStore.id, newStore);
         fetchStores();
       }
-      catch (error) {
-        console.error("Failed to update store", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to update store", error);
+    }
+    finally {
       setEditOpen(false);
     }
+  };
 
-  }
   const handleNewSubmit = async () => {
-    let newStore = {
-      id: "0",
-      name: selectedName,
-      address: selectedAddress
-    };
-    setSelectedStore(newStore);
-    if (newStore) {
-      try {
+    try {
+      let newStore = {
+        id: "0",
+        name: selectedName,
+        address: selectedAddress
+      };
+      setSelectedStore(newStore);
+      
+      if (newStore) {
         await createStore(newStore);
-        fetchStores();
+      fetchStores();
       }
-      catch (error) {
-        console.error("Failed to add new store", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to add new store", error);
+    }
+    finally {
       setNewOpen(false);
     }
   };
@@ -143,10 +142,7 @@ const StoreTable = () => {
   };
 
   const invalidSelectedStore = () => {
-    if (selectedName === "") {
-      return true;
-    }
-    if (selectedAddress === "") {
+    if ((selectedName === "") || (selectedAddress === "")) {
       return true;
     }
     return false;
@@ -160,6 +156,16 @@ const StoreTable = () => {
     setPageSize(value);
     setCurrentPage(1); // Reset to first page on page size change
   };
+
+  useEffect(() => {
+    fetchStores(currentPage, pageSize, sortColumn, sortDirection);
+  }, [currentPage, pageSize, sortColumn, sortDirection]);
+
+
+  useEffect(() => {
+    setCreateIsDisabled(invalidSelectedStore);
+    setEditIsDisabled(invalidSelectedStore);
+  }, [selectedAddress, selectedName]);
 
   if (loading) return <p>Loading...</p>;
 

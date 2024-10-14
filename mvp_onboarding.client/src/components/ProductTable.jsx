@@ -40,15 +40,6 @@ const ProductTable = () => {
     setSortDirection(direction);
   }
 
-  useEffect(() => {
-    fetchProducts(currentPage, pageSize, sortColumn, sortDirection);
-  }, [currentPage, pageSize, sortColumn, sortDirection]);
-
-  useEffect(() => {
-    setCreateIsDisabled(invalidSelectedProduct);
-    setEditIsDisabled(invalidSelectedProduct);
-  }, [selectedPrice, selectedName]);
-
   const fetchProducts = async (currentPage, pageSize, sortColumn, sortDirection) => {
     try {
       const data = await getProducts(currentPage, pageSize, sortColumn, sortDirection);
@@ -62,52 +53,61 @@ const ProductTable = () => {
       setLoading(false);
     }
   };
+
   const handleDelete = async () => {
-    if (selectedProduct) {
-      try {
+    try {
+      if (selectedProduct && selectedPrice?.id) {
         await deleteProduct(selectedProduct?.id);
         setProducts(products.filter((product) => product.id !== selectedProduct?.id));
-        setDeleteOpen(false);
       }
-      catch (error) {
-        console.error("Failed to delete product", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to delete product", error);
+    }
+    finally {
+      setDeleteOpen(false);
     }
   };
 
   const handleEditSubmit = async () => {
-    let newProduct = {
-      id: selectedProduct.id,
-      name: selectedName,
-      price: selectedPrice
-    };
-    if (newProduct) {
-      try {
+    try {
+      let newProduct = {
+        id: selectedProduct.id,
+        name: selectedName,
+        price: selectedPrice
+      };
+
+      if (newProduct && newProduct?.id) {
         await updateProduct(selectedProduct.id, newProduct);
         fetchProducts();
       }
-      catch (error) {
-        console.error("Failed to update product", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to update product", error);
+    }
+    finally {
       setEditOpen(false);
     }
+  };
 
-  }
   const handleNewSubmit = async () => {
-    let newProduct = {
-      id: "0",
-      name: selectedName,
-      price: selectedPrice
-    };
-    setSelectedProduct(newProduct);
-    if (newProduct) {
-      try {
+    try {
+      let newProduct = {
+        id: "0",
+        name: selectedName,
+        price: selectedPrice
+      };
+      setSelectedProduct(newProduct);
+
+      if (newProduct) {
         await createProduct(newProduct);
         fetchProducts();
       }
-      catch (error) {
-        console.error("Failed to add new product", error);
-      }
+    }
+    catch (error) {
+      console.error("Failed to add new product", error);
+    }
+    finally {
       setNewOpen(false);
     }
   };
@@ -142,10 +142,7 @@ const ProductTable = () => {
   };
 
   const invalidSelectedProduct = () => {
-    if (selectedName === "") {
-      return true;
-    }
-    if (selectedPrice === "") {
+    if ((selectedName === "") || (selectedPrice === "")) {
       return true;
     }
     if (isNaN(selectedPrice)) {
@@ -166,6 +163,15 @@ const ProductTable = () => {
     setPageSize(value);
     setCurrentPage(1); // Reset to first page on page size change
   };
+
+  useEffect(() => {
+    fetchProducts(currentPage, pageSize, sortColumn, sortDirection);
+  }, [currentPage, pageSize, sortColumn, sortDirection]);
+
+  useEffect(() => {
+    setCreateIsDisabled(invalidSelectedProduct);
+    setEditIsDisabled(invalidSelectedProduct);
+  }, [selectedPrice, selectedName]);
 
   if (loading) return <p>Loading...</p>;
 

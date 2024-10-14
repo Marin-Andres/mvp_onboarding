@@ -21,8 +21,13 @@ export const getStores = async (pageNumber, pageSize, sortColumn, sortDirection)
 // Get store 
 export const getStore = async (id) => {
   try {
-    const response = await api.get(`/Store/${id}`);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid store id.";
+    }
+    else {    
+      const response = await api.get(`/Store/${id}`);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error getting store with ID ${id}:`, error);
     throw error;
@@ -43,8 +48,13 @@ export const createStore = async (storeData) => {
 // Update store
 export const updateStore = async (id, storeData) => {
   try {
-    const response = await api.put(`/Store/${id}`, storeData);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid store id.";
+    }
+    else {    
+      const response = await api.put(`/Store/${id}`, storeData);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error updating store with ID ${id}:`, error);
     throw error;
@@ -54,8 +64,13 @@ export const updateStore = async (id, storeData) => {
 // Delete store
 export const deleteStore = async (id) => {
   try {
-    const response = await api.delete(`/Store/${id}`);
-    return response.data;
+    if (!(Number.isInteger(id) && id >0)) {
+      throw "Invalid store id.";
+    }
+    else {
+      const response = await api.delete(`/Store/${id}`);
+      return response.data;
+    }
   } catch (error) {
     console.error(`Error deleting store with ID ${id}:`, error);
     throw error;
