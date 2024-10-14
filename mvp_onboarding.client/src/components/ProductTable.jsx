@@ -8,7 +8,6 @@ import {
   Dropdown
 } from "semantic-ui-react";
 import DeleteModal from "./DeleteModal";
-import NewModal from "./NewModal";
 import EditModal from "./EditModal";
 
 const ProductTable = () => {
@@ -268,12 +267,13 @@ const ProductTable = () => {
       />
 
       {/* modal window for new product */}
-      <NewModal
+      <EditModal
+        modalAction="Create"
         itemName="product"
         fieldName="Price"
-        newOpen={newOpen}
-        setNewOpen={setNewOpen}
-        handleNewSubmit={handleNewSubmit}
+        editOpen={newOpen}
+        setEditOpen={setNewOpen}
+        handleEditSubmit={handleNewSubmit}
         handleNameChange={handleNameChange}
         handleFieldChange={handlePriceChange}
         createIsDisabled={createIsDisabled}
@@ -281,16 +281,17 @@ const ProductTable = () => {
 
       {/* modal window for edit product */}
       <EditModal
-          itemName="product"
-          fieldName="Price"
-          nameValue={selectedProduct.name}
-          fieldValue={selectedProduct.price}
-          editOpen={editOpen}
-          setEditOpen={setEditOpen}
-          handleEditSubmit={handleEditSubmit}
-          handleNameChange={handleNameChange}
-          handleFieldChange={handlePriceChange}
-          editIsDisabled={editIsDisabled}
+        modalAction="Edit"
+        itemName="product"
+        fieldName="Price"
+        nameValue={selectedProduct.name}
+        fieldValue={selectedProduct.price}
+        editOpen={editOpen}
+        setEditOpen={setEditOpen}
+        handleEditSubmit={handleEditSubmit}
+        handleNameChange={handleNameChange}
+        handleFieldChange={handlePriceChange}
+        editIsDisabled={editIsDisabled}
       />
     </div>
   );

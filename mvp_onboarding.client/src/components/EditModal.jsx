@@ -7,6 +7,7 @@ import {
  } from "semantic-ui-react";
 
 const EditModal = ({
+    modalAction,
     itemName, 
     fieldName,
     nameValue,
@@ -28,7 +29,7 @@ const EditModal = ({
         open={editOpen}
         onClose={() => setEditOpen(false)}
       >
-        <Modal.Header>Edit {itemName}</Modal.Header>
+        <Modal.Header>{modalAction} {itemName}</Modal.Header>
         <Modal.Content>
           <Form onSubmit={handleEditSubmit}>
             <Form.Field>
@@ -62,7 +63,7 @@ const EditModal = ({
             onClick={handleEditSubmit} 
             type="submit" disabled={editIsDisabled}
             >
-            create &nbsp;
+            {modalAction.toLowerCase()} &nbsp;
             <Icon name="checkmark" />
           </Button>
 
