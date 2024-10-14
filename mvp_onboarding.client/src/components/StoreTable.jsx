@@ -17,11 +17,13 @@ const StoreTable = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [selectedStore, setSelectedStore] = useState(null);
+  const [selectedStore, setSelectedStore] = useState({
+    id: null,
+    name: '',
+    address: '',
+  });
   const [createIsDisabled, setCreateIsDisabled] = useState(true);
   const [editIsDisabled, setEditIsDisabled] = useState(true);
-  const [selectedAddress, setSelectedAddress] = useState("");
-  const [selectedName, setSelectedName] = useState("");
 
   const [sortColumn, setSortColumn] = useState('Name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -73,8 +75,8 @@ const StoreTable = () => {
     try {
       let newStore = {
         id: selectedStore.id,
-        name: selectedName,
-        address: selectedAddress
+        name: selectedStore.name,
+        address: selectedStore.address
       };
 
       if (newStore && newStore?.id) {
@@ -94,8 +96,8 @@ const StoreTable = () => {
     try {
       let newStore = {
         id: "0",
-        name: selectedName,
-        address: selectedAddress
+        name: selectedStore.name,
+        address: selectedStore.address
       };
       setSelectedStore(newStore);
       
@@ -119,30 +121,32 @@ const StoreTable = () => {
 
   const confirmEdit = (store) => {
     setSelectedStore(store);
-    setSelectedName(store.name);
-    setSelectedAddress(store.address);
     setEditOpen(true);
   };
 
   const confirmNewSubmit = () => {
     const store = { id: "0", name: "", address: "" };
-    setSelectedName("");
-    setSelectedAddress("");
     setSelectedStore(store);
     setNewOpen(true);
   };
 
 
   const handleNameChange = (event) => {
-    setSelectedName(event.target.value);
+    setSelectedStore((prevStore) => ({
+      ...prevStore,
+      name: event.target.value,
+    }));
   };
 
   const handleAddressChange = (event) => {
-    setSelectedAddress(event.target.value);
+    setSelectedStore((prevStore) => ({
+      ...prevStore,
+      address: event.target.value,
+    }));
   };
 
   const invalidSelectedStore = () => {
-    if ((selectedName === "") || (selectedAddress === "")) {
+    if ((selectedStore.name === "") || (selectedStore.address === "")) {
       return true;
     }
     return false;
@@ -165,7 +169,7 @@ const StoreTable = () => {
   useEffect(() => {
     setCreateIsDisabled(invalidSelectedStore);
     setEditIsDisabled(invalidSelectedStore);
-  }, [selectedAddress, selectedName]);
+  }, [selectedStore]);
 
   if (loading) return <p>Loading...</p>;
 
@@ -329,7 +333,7 @@ const StoreTable = () => {
                 name="storeName"
                 placeholder="Name"
                 onChange={handleNameChange}
-                value={selectedName}
+                value={selectedStore.name}
               />
             </Form.Field>
             <Form.Field>
@@ -339,7 +343,7 @@ const StoreTable = () => {
                 name="storeAddress"
                 placeholder="Address"
                 onChange={handleAddressChange}
-                value={selectedAddress}
+                value={selectedStore.address}
               />
             </Form.Field>
           </Form>

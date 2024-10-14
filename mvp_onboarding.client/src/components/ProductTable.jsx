@@ -17,11 +17,13 @@ const ProductTable = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState({
+    id: null,
+    name: '',
+    price: '',
+  });
   const [createIsDisabled, setCreateIsDisabled] = useState(true);
   const [editIsDisabled, setEditIsDisabled] = useState(true);
-  const [selectedPrice, setSelectedPrice] = useState("");
-  const [selectedName, setSelectedName] = useState("");
 
   const [sortColumn, setSortColumn] = useState('Name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -56,7 +58,7 @@ const ProductTable = () => {
 
   const handleDelete = async () => {
     try {
-      if (selectedProduct && selectedPrice?.id) {
+      if (selectedProduct && selectedProduct?.id) {
         await deleteProduct(selectedProduct?.id);
         setProducts(products.filter((product) => product.id !== selectedProduct?.id));
       }
@@ -73,8 +75,8 @@ const ProductTable = () => {
     try {
       let newProduct = {
         id: selectedProduct.id,
-        name: selectedName,
-        price: selectedPrice
+        name: selectedProduct.name,
+        price: selectedProduct.price
       };
 
       if (newProduct && newProduct?.id) {
@@ -94,8 +96,8 @@ const ProductTable = () => {
     try {
       let newProduct = {
         id: "0",
-        name: selectedName,
-        price: selectedPrice
+        name: selectedProduct.name,
+        price: selectedProduct.price
       };
       setSelectedProduct(newProduct);
 
@@ -119,36 +121,38 @@ const ProductTable = () => {
 
   const confirmEdit = (product) => {
     setSelectedProduct(product);
-    setSelectedName(product.name);
-    setSelectedPrice(product.price);
     setEditOpen(true);
   };
 
   const confirmNewSubmit = () => {
     const product = { id: "0", name: "", price: "" };
-    setSelectedName("");
-    setSelectedPrice("");
     setSelectedProduct(product);
     setNewOpen(true);
   };
 
 
   const handleNameChange = (event) => {
-    setSelectedName(event.target.value);
+    setSelectedProduct((prevProduct) => ({
+      ...prevProduct,
+      name: event.target.value,
+    }));
   };
 
   const handlePriceChange = (event) => {
-    setSelectedPrice(event.target.value);
+    setSelectedProduct((prevProduct) => ({
+      ...prevProduct,
+      price: event.target.value,
+    }));
   };
 
   const invalidSelectedProduct = () => {
-    if ((selectedName === "") || (selectedPrice === "")) {
+    if ((selectedProduct.name === "") || (selectedProduct.price === "")) {
       return true;
     }
-    if (isNaN(selectedPrice)) {
+    if (isNaN(selectedProduct.price)) {
       return true;
     }
-    if (selectedPrice < 0) {
+    if (selectedProduct.price < 0) {
       return true;
     }
     return false;
@@ -171,7 +175,7 @@ const ProductTable = () => {
   useEffect(() => {
     setCreateIsDisabled(invalidSelectedProduct);
     setEditIsDisabled(invalidSelectedProduct);
-  }, [selectedPrice, selectedName]);
+  }, [selectedProduct]);
 
   if (loading) return <p>Loading...</p>;
 
@@ -335,7 +339,7 @@ const ProductTable = () => {
                 name="productName"
                 placeholder="Name"
                 onChange={handleNameChange}
-                value={selectedName}
+                value={selectedProduct.name}
               />
             </Form.Field>
             <Form.Field>
@@ -345,7 +349,7 @@ const ProductTable = () => {
                 name="productPrice"
                 placeholder="Price"
                 onChange={handlePriceChange}
-                value={selectedPrice}
+                value={selectedProduct.price}
               />
             </Form.Field>
           </Form>

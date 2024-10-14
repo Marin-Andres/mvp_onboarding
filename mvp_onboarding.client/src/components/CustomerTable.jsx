@@ -17,11 +17,13 @@ const CustomerTable = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState({
+    id: null,
+    name: '',
+    address: '',
+  });
   const [createIsDisabled, setCreateIsDisabled] = useState(true);
   const [editIsDisabled, setEditIsDisabled] = useState(true);
-  const [selectedAddress, setSelectedAddress] = useState("");
-  const [selectedName, setSelectedName] = useState("");
 
   const [sortColumn, setSortColumn] = useState('Name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -53,7 +55,7 @@ const CustomerTable = () => {
       setLoading(false);
     }
   };
-  
+
   const handleDelete = async () => {
     try {
       if (selectedCustomer && selectedCustomer?.id) {
@@ -73,8 +75,8 @@ const CustomerTable = () => {
     try {
       let newCustomer = {
         id: selectedCustomer.id,
-        name: selectedName,
-        address: selectedAddress
+        name: selectedCustomer.name,
+        address: selectedCustomer.address
       };
 
       if (newCustomer && newCustomer?.id) {
@@ -94,8 +96,8 @@ const CustomerTable = () => {
     try {
       let newCustomer = {
         id: "0",
-        name: selectedName,
-        address: selectedAddress
+        name: selectedCustomer.name,
+        address: selectedCustomer.address
       };
       setSelectedCustomer(newCustomer);
       
@@ -119,30 +121,32 @@ const CustomerTable = () => {
 
   const confirmEdit = (customer) => {
     setSelectedCustomer(customer);
-    setSelectedName(customer.name);
-    setSelectedAddress(customer.address);
     setEditOpen(true);
   };
 
   const confirmNewSubmit = () => {
     const customer = { id: "0", name: "", address: "" };
-    setSelectedName("");
-    setSelectedAddress("");
     setSelectedCustomer(customer);
     setNewOpen(true);
   };
 
 
   const handleNameChange = (event) => {
-    setSelectedName(event.target.value);
+    setSelectedCustomer((prevCustomer) => ({
+      ...prevCustomer,
+      name: event.target.value,
+    }));
   };
 
   const handleAddressChange = (event) => {
-    setSelectedAddress(event.target.value);
+    setSelectedCustomer((prevCustomer) => ({
+      ...prevCustomer,
+      address: event.target.value,
+    }));
   };
 
   const invalidSelectedCustomer = () => {
-    if ((selectedName === "") || (selectedAddress === "")) {
+    if ((selectedCustomer.name === "") || (selectedCustomer.address === "")) {
       return true;
     }
     return false;
@@ -164,7 +168,7 @@ const CustomerTable = () => {
   useEffect(() => {
     setCreateIsDisabled(invalidSelectedCustomer);
     setEditIsDisabled(invalidSelectedCustomer);
-  }, [selectedAddress, selectedName]);
+  }, [selectedCustomer]);
 
   if (loading) return <p>Loading...</p>;
 
@@ -327,7 +331,7 @@ const CustomerTable = () => {
                 name="customerName"
                 placeholder="Name"
                 onChange={handleNameChange}
-                value={selectedName}
+                value={selectedCustomer.name}
               />
             </Form.Field>
             <Form.Field>
@@ -337,7 +341,7 @@ const CustomerTable = () => {
                 name="customerAddress"
                 placeholder="Address"
                 onChange={handleAddressChange}
-                value={selectedAddress}
+                value={selectedCustomer.address}
               />
             </Form.Field>
           </Form>
