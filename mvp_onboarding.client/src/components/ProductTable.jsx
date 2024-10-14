@@ -4,13 +4,12 @@ import {
   Table,
   Button,
   Icon,
-  Modal,
-  Form,
-  Input,
   Pagination,
   Dropdown
 } from "semantic-ui-react";
 import DeleteModal from "./DeleteModal";
+import NewModal from "./NewModal";
+import EditModal from "./EditModal";
 
 const ProductTable = () => {
   const [products, setProducts] = useState([]);
@@ -269,90 +268,30 @@ const ProductTable = () => {
       />
 
       {/* modal window for new product */}
-      <Modal
-        dimmer="blurring"
-        size="tiny"
-        open={newOpen}
-        onClose={() => setNewOpen(false)}
-      >
-        <Modal.Header>Create product</Modal.Header>
-        <Modal.Content>
-          <Form onSubmit={handleNewSubmit}>
-            <Form.Field>
-              <label>NAME</label>
-              <Input
-                type="text"
-                name="productName"
-                placeholder="Name"
-                onChange={handleNameChange}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>PRICE</label>
-              <Input
-                type="text"
-                name="productPrice"
-                placeholder="Price"
-                onChange={handlePriceChange}
-              />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setNewOpen(false)}>
-            cancel
-          </Button>
-          <Button positive onClick={handleNewSubmit} type="submit" disabled={createIsDisabled}>
-            create &nbsp;
-            <Icon name="checkmark" />
-          </Button>
-
-        </Modal.Actions>
-      </Modal>
+      <NewModal
+        itemName="product"
+        fieldName="Price"
+        newOpen={newOpen}
+        setNewOpen={setNewOpen}
+        handleNewSubmit={handleNewSubmit}
+        handleNameChange={handleNameChange}
+        handleFieldChange={handlePriceChange}
+        createIsDisabled={createIsDisabled}
+      />
 
       {/* modal window for edit product */}
-      <Modal
-        dimmer="blurring"
-        size="tiny"
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-      >
-        <Modal.Header>Edit product</Modal.Header>
-        <Modal.Content>
-          <Form onSubmit={handleEditSubmit}>
-            <Form.Field>
-              <label>NAME</label>
-              <Input
-                type="text"
-                name="productName"
-                placeholder="Name"
-                onChange={handleNameChange}
-                value={selectedProduct.name}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>PRICE</label>
-              <Input
-                type="text"
-                name="productPrice"
-                placeholder="Price"
-                onChange={handlePriceChange}
-                value={selectedProduct.price}
-              />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setEditOpen(false)}>
-            cancel
-          </Button>
-          <Button positive onClick={handleEditSubmit} type="submit" disabled={editIsDisabled}>
-            edit &nbsp;
-            <Icon name="checkmark" />
-          </Button>
-
-        </Modal.Actions>
-      </Modal>
+      <EditModal
+          itemName="product"
+          fieldName="Price"
+          nameValue={selectedProduct.name}
+          fieldValue={selectedProduct.price}
+          editOpen={editOpen}
+          setEditOpen={setEditOpen}
+          handleEditSubmit={handleEditSubmit}
+          handleNameChange={handleNameChange}
+          handleFieldChange={handlePriceChange}
+          editIsDisabled={editIsDisabled}
+      />
     </div>
   );
 };

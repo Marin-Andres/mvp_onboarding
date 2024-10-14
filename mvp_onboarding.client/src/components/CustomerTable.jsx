@@ -4,13 +4,12 @@ import {
   Table,
   Button,
   Icon,
-  Modal,
-  Form,
-  Input,
   Pagination,
   Dropdown
 } from "semantic-ui-react";
 import DeleteModal from "./DeleteModal";
+import NewModal from "./NewModal";
+import EditModal from "./EditModal";
 
 const CustomerTable = () => {
   const [customers, setCustomers] = useState([]);
@@ -261,90 +260,31 @@ const CustomerTable = () => {
       />
 
       {/* modal window for new customer */}
-      <Modal
-        dimmer="blurring"
-        size="tiny"
-        open={newOpen}
-        onClose={() => setNewOpen(false)}
-      >
-        <Modal.Header>Create customer</Modal.Header>
-        <Modal.Content>
-          <Form onSubmit={handleNewSubmit}>
-            <Form.Field>
-              <label>NAME</label>
-              <Input
-                type="text"
-                name="customerName"
-                placeholder="Name"
-                onChange={handleNameChange}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>ADDRESS</label>
-              <Input
-                type="text"
-                name="customerAddress"
-                placeholder="Address"
-                onChange={handleAddressChange}
-              />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setNewOpen(false)}>
-            cancel
-          </Button>
-          <Button positive onClick={handleNewSubmit} type="submit" disabled={createIsDisabled}>
-            create &nbsp;
-            <Icon name="checkmark" />
-          </Button>
-
-        </Modal.Actions>
-      </Modal>
+      <NewModal
+        itemName="customer"
+        fieldName="Address"
+        newOpen={newOpen}
+        setNewOpen={setNewOpen}
+        handleNewSubmit={handleNewSubmit}
+        handleNameChange={handleNameChange}
+        handleFieldChange={handleAddressChange}
+        createIsDisabled={createIsDisabled}
+      />
 
       {/* modal window for edit customer */}
-      <Modal
-        dimmer="blurring"
-        size="small"
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-      >
-        <Modal.Header>Edit customer</Modal.Header>
-        <Modal.Content>
-          <Form onSubmit={handleEditSubmit}>
-            <Form.Field>
-              <label>NAME</label>
-              <Input
-                type="text"
-                name="customerName"
-                placeholder="Name"
-                onChange={handleNameChange}
-                value={selectedCustomer.name}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>ADDRESS</label>
-              <Input
-                type="text"
-                name="customerAddress"
-                placeholder="Address"
-                onChange={handleAddressChange}
-                value={selectedCustomer.address}
-              />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setEditOpen(false)}>
-            cancel
-          </Button>
-          <Button positive onClick={handleEditSubmit} type="submit" disabled={editIsDisabled}>
-            edit &nbsp;
-            <Icon name="checkmark" />
-          </Button>
+      <EditModal
+          itemName="customer"
+          fieldName="Address"
+          nameValue={selectedCustomer.name}
+          fieldValue={selectedCustomer.address}
+          editOpen={editOpen}
+          setEditOpen={setEditOpen}
+          handleEditSubmit={handleEditSubmit}
+          handleNameChange={handleNameChange}
+          handleFieldChange={handleAddressChange}
+          editIsDisabled={editIsDisabled}
+      />
 
-        </Modal.Actions>
-      </Modal>
     </div>
   );
 };

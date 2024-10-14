@@ -3,8 +3,12 @@ import {
     Button,
  } from "semantic-ui-react";
 
-const DeleteModal = ({itemName, deleteOpen, setDeleteOpen, handleDelete}) => {
-
+const DeleteModal = ({
+    itemName, 
+    deleteOpen, 
+    setDeleteOpen, 
+    handleDelete
+    }) => {
 
     return (
         <div>
