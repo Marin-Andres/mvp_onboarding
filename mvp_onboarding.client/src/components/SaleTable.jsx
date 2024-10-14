@@ -15,6 +15,7 @@ import {
   Dropdown
 } from "semantic-ui-react";
 import DeleteModal from "./DeleteModal";
+import SaleEditModal from "./SaleEditModal";
 
 const SaleTable = () => {
   const [sales, setSales] = useState([]);
@@ -382,138 +383,44 @@ const SaleTable = () => {
       />
 
       {/* modal window for new sale */}
-      <Modal
-        dimmer="blurring"
-        size="tiny"
-        open={newOpen}
-        onClose={() => setNewOpen(false)}
-      >
-        <Modal.Header>Create sale</Modal.Header>
-        <Modal.Content>
-          <Form onSubmit={handleNewSubmit}>
-            <Form.Field>
-              <label>Date sold</label>
-              <DatePicker
-                selected={soldDate}
-                onChange={setSoldDate}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>Customer</label>
-              <select
-                class="ui search dropdown"
-                value={selectedCustomer}
-                onChange={handleCustomerChange}
-              >
-                {[{ id: "", name: "" }, ...customers].map((customer) => (
-                  <option key={customer.id} value={customer.id}>{customer.name}</option>
-                ))}
-              </select>
-            </Form.Field>
-            <Form.Field>
-              <label>Product</label>
-              <select
-                class="ui search dropdown"
-                value={selectedProduct}
-                onChange={handleProductChange}
-              >
-                {[{ id: "", name: "" }, ...products].map((product) => (
-                  <option key={product.id} value={product.id}>{product.name}</option>
-                ))}
-              </select>
-            </Form.Field>
-            <Form.Field>
-              <label>Store</label>
-              <select
-                class="ui search dropdown"
-                value={selectedStore}
-                onChange={handleStoreChange}
-              >
-                {[{ id: "", name: "" }, ...stores].map((store) => (
-                  <option key={store.id} value={store.id}>{store.name}</option>
-                ))}
-              </select>
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setNewOpen(false)}>
-            cancel
-          </Button>
-          <Button positive onClick={handleNewSubmit} type="submit" disabled={createIsDisabled}>
-            create &nbsp;
-            <Icon name="checkmark" />
-          </Button>
-
-        </Modal.Actions>
-      </Modal>
+      <SaleEditModal
+        modalAction="Create"
+        editOpen={newOpen}
+        setEditOpen={setNewOpen}
+        handleEditSubmit={handleNewSubmit}
+        editIsDisabled={createIsDisabled}
+        soldDate={soldDate}
+        setSoldDate={setSoldDate}
+        selectedCustomer={selectedCustomer}
+        handleCustomerChange={handleCustomerChange}
+        customers={customers}
+        selectedProduct={selectedProduct}
+        handleProductChange={handleProductChange}
+        products={products}
+        selectedStore={selectedStore}
+        handleStoreChange={handleStoreChange}
+        stores={stores}
+      />
 
       {/* modal window for edit sale */}
-      <Modal
-        dimmer="blurring"
-        size="tiny"
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-      >
-        <Modal.Header>Edit sale</Modal.Header>
-        <Modal.Content>
-          <Form onSubmit={handleEditSubmit}>
-            <Form.Field>
-              <label>Date sold</label>
-              <DatePicker
-                selected={soldDate}
-                onChange={setSoldDate}
-              />
-            </Form.Field>
-            <Form.Field>
-              <label>Customer</label>
-              <select
-                class="ui search dropdown"
-                value={selectedCustomer}
-                onChange={handleCustomerChange}
-              >
-                {[{ id: "", name: "" }, ...customers].map((customer) => (
-                  <option key={customer.id} value={customer.id}>{customer.name}</option>
-                ))}
-              </select>
-            </Form.Field>
-            <Form.Field>
-              <label>Product</label>
-              <select
-                class="ui search dropdown"
-                value={selectedProduct}
-                onChange={handleProductChange}
-              >
-                {[{ id: "", name: "" }, ...products].map((product) => (
-                  <option key={product.id} value={product.id}>{product.name}</option>
-                ))}
-              </select>
-            </Form.Field>
-            <Form.Field>
-              <label>Store</label>
-              <select
-                class="ui search dropdown"
-                value={selectedStore}
-                onChange={handleStoreChange}
-              >
-                {[{ id: "", name: "" }, ...stores].map((store) => (
-                  <option key={store.id} value={store.id}>{store.name}</option>
-                ))}
-              </select>
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setEditOpen(false)}>
-            cancel
-          </Button>
-          <Button positive onClick={handleEditSubmit} type="submit" disabled={editIsDisabled} >
-            edit &nbsp;
-            <Icon name="checkmark" />
-          </Button>
-
-        </Modal.Actions>
-      </Modal>
+      <SaleEditModal
+        modalAction="Edit"
+        editOpen={editOpen}
+        setEditOpen={setEditOpen}
+        handleEditSubmit={handleEditSubmit}
+        editIsDisabled={editIsDisabled}
+        soldDate={soldDate}
+        setSoldDate={setSoldDate}
+        selectedCustomer={selectedCustomer}
+        handleCustomerChange={handleCustomerChange}
+        customers={customers}
+        selectedProduct={selectedProduct}
+        handleProductChange={handleProductChange}
+        products={products}
+        selectedStore={selectedStore}
+        handleStoreChange={handleStoreChange}
+        stores={stores}
+      />
     </div>
   );
 };
