@@ -10,6 +10,7 @@ import {
   Pagination,
   Dropdown
 } from "semantic-ui-react";
+import DeleteModal from "./DeleteModal";
 
 const ProductTable = () => {
   const [products, setProducts] = useState([]);
@@ -260,25 +261,12 @@ const ProductTable = () => {
       </div>
 
       {/* modal window for delete product */}
-      <Modal
-        dimmer="blurring"
-        size="tiny"
-        open={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-      >
-        <Modal.Header>Delete product</Modal.Header>
-        <Modal.Content>
-          <p>Are you sure?</p>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button color="black" onClick={() => setDeleteOpen(false)}>
-            cancel
-          </Button>
-          <Button color="red" onClick={handleDelete}>
-            delete
-          </Button>
-        </Modal.Actions>
-      </Modal>
+      <DeleteModal
+        itemName="product"
+        deleteOpen={deleteOpen}
+        setDeleteOpen={setDeleteOpen}
+        handleDelete={handleDelete}
+      />
 
       {/* modal window for new product */}
       <Modal
