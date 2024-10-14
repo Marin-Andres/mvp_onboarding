@@ -8,8 +8,6 @@ import {
   Table,
   Button,
   Icon,
-  Modal,
-  Form,
   Pagination,
   Dropdown
 } from "semantic-ui-react";
