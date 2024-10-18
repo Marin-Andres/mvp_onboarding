@@ -21,7 +21,6 @@ const StoreTable = () => {
     name: '',
     address: '',
   });
-  const [createIsDisabled, setCreateIsDisabled] = useState(true);
   const [editIsDisabled, setEditIsDisabled] = useState(true);
 
   const [sortColumn, setSortColumn] = useState('Name');
@@ -166,7 +165,6 @@ const StoreTable = () => {
 
 
   useEffect(() => {
-    setCreateIsDisabled(invalidSelectedStore);
     setEditIsDisabled(invalidSelectedStore);
   }, [selectedStore]);
 
@@ -270,7 +268,7 @@ const StoreTable = () => {
         handleEditSubmit={handleNewSubmit}
         handleNameChange={handleNameChange}
         handleFieldChange={handleAddressChange}
-        createIsDisabled={createIsDisabled}
+        editIsDisabled={editIsDisabled}
       />
 
       {/* modal window for edit store */}

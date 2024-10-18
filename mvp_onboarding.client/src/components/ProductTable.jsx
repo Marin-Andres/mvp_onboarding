@@ -21,7 +21,6 @@ const ProductTable = () => {
     name: '',
     price: '',
   });
-  const [createIsDisabled, setCreateIsDisabled] = useState(true);
   const [editIsDisabled, setEditIsDisabled] = useState(true);
 
   const [sortColumn, setSortColumn] = useState('Name');
@@ -172,7 +171,6 @@ const ProductTable = () => {
   }, [currentPage, pageSize, sortColumn, sortDirection]);
 
   useEffect(() => {
-    setCreateIsDisabled(invalidSelectedProduct);
     setEditIsDisabled(invalidSelectedProduct);
   }, [selectedProduct]);
 
@@ -276,7 +274,7 @@ const ProductTable = () => {
         handleEditSubmit={handleNewSubmit}
         handleNameChange={handleNameChange}
         handleFieldChange={handlePriceChange}
-        createIsDisabled={createIsDisabled}
+        editIsDisabled={editIsDisabled}
       />
 
       {/* modal window for edit product */}
