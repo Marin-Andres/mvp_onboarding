@@ -1,4 +1,5 @@
 import api from './api';
+import { idValidation } from '../util/validation';
 
 // Get all customers
 export const getCustomers = async (pageNumber, pageSize, sortColumn, sortDirection) => {
@@ -21,13 +22,10 @@ export const getCustomers = async (pageNumber, pageSize, sortColumn, sortDirecti
 // Get customer 
 export const getCustomer = async (id) => {
   try {
-    if (!(Number.isInteger(id) && id >0)) {
-      throw "Invalid customer id.";
-    }
-    else {
-      const response = await api.get(`/Customer/${id}`);
-      return response.data;
-    }
+    const isIdValid = idValidation(id);
+    if (!isIdValid) { throw "Invalid customer id."; }
+    const response = await api.get(`/Customer/${id}`);
+    return response.data;
   } catch (error) {
     console.error(`Error getting customer with ID ${id}:`, error);
     throw error;
@@ -48,13 +46,10 @@ export const createCustomer = async (customerData) => {
 // Update customer
 export const updateCustomer = async (id, customerData) => {
   try {
-    if (!(Number.isInteger(id) && id >0)) {
-        throw "Invalid customer id.";
-      }
-      else {
-        const response = await api.put(`/Customer/${id}`, customerData);
-        return response.data;
-      }
+    const isIdValid = idValidation(id);
+    if (!isIdValid) {  throw "Invalid customer id."; }
+    const response = await api.put(`/Customer/${id}`, customerData);
+    return response.data;
   } catch (error) {
     console.error(`Error updating customer with ID ${id}:`, error);
     throw error;
@@ -64,13 +59,10 @@ export const updateCustomer = async (id, customerData) => {
 // Delete customer
 export const deleteCustomer = async (id) => {
   try {
-    if (!(Number.isInteger(id) && id >0)) {
-        throw "Invalid customer id.";
-      }
-      else {
-        const response = await api.delete(`/Customer/${id}`);
-        return response.data;
-      }
+      const isIdValid = idValidation(id);
+      if (!isIdValid) { throw "Invalid customer id."; }
+      const response = await api.delete(`/Customer/${id}`);
+      return response.data;
   } catch (error) {
     console.error(`Error deleting customer with ID ${id}:`, error);
     throw error;

@@ -1,4 +1,5 @@
 import api from './api';
+import { idValidation } from '../util/validation';
 
 // Get all sales
 export const getSales = async () => {
@@ -14,13 +15,10 @@ export const getSales = async () => {
 // Get sale 
 export const getSale = async (id) => {
   try {
-    if (!(Number.isInteger(id) && id >0)) {
-      throw "Invalid sale id.";
-    }
-    else {    
-      const response = await api.get(`/Sale/${id}`);
-      return response.data;
-    }
+    const isIdValid = idValidation(id);
+    if (!isIdValid) { throw "Invalid sale id."; }
+    const response = await api.get(`/Sale/${id}`);
+    return response.data;
   } catch (error) {
     console.error(`Error getting sale with ID ${id}:`, error);
     throw error;
@@ -41,13 +39,10 @@ export const createSale = async (saleData) => {
 // Update sale
 export const updateSale = async (id, saleData) => {
   try {
-    if (!(Number.isInteger(id) && id >0)) {
-      throw "Invalid sale id.";
-    }
-    else {    
-      const response = await api.put(`/Sale/${id}`, saleData);
-      return response.data;
-    }
+    const isIdValid = idValidation(id);
+    if (!isIdValid) { throw "Invalid sale id."; }
+    const response = await api.put(`/Sale/${id}`, saleData);
+    return response.data;
   } catch (error) {
     console.error(`Error updating sale with ID ${id}:`, error);
     throw error;
@@ -57,13 +52,10 @@ export const updateSale = async (id, saleData) => {
 // Delete sale
 export const deleteSale = async (id) => {
   try {
-    if (!(Number.isInteger(id) && id >0)) {
-      throw "Invalid sale id.";
-    }
-    else {    
-      const response = await api.delete(`/Sale/${id}`);
-      return response.data;
-    }
+    const isIdValid = idValidation(id);
+    if (!isIdValid) { throw "Invalid sale id."; }
+    const response = await api.delete(`/Sale/${id}`);
+    return response.data;
   } catch (error) {
     console.error(`Error deleting sale with ID ${id}:`, error);
     throw error;
