@@ -396,3 +396,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/mvp_onboarding.client.zip
+/mvp_onboarding.Server.zip

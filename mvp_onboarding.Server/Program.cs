@@ -6,6 +6,9 @@ using mvp_onboarding.Server.Classes;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -21,10 +24,25 @@ builder.Services.AddScoped<ISalesViewMethods, SalesViewMethods>();
 builder.Services.AddDbContext<TalentOnboardingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Onboarding")));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowViteLocalhost",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:5173")  
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowViteLocalhost");
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseExceptionHandler("/error");
+app.UseHsts();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
