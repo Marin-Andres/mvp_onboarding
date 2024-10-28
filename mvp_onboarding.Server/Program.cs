@@ -1,3 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using mvp_onboarding.Server.Interfaces;
+using mvp_onboarding.Server.Models;
+using mvp_onboarding.Server.Classes;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +11,15 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<ICustomerMethods, CustomerMethods>();
+builder.Services.AddScoped<IProductMethods, ProductMethods>();
+builder.Services.AddScoped<IStoreMethods, StoreMethods>();
+builder.Services.AddScoped<ISaleMethods, SaleMethods>();
+builder.Services.AddScoped<ISalesViewMethods, SalesViewMethods>();
+
+builder.Services.AddDbContext<TalentOnboardingContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Onboarding")));
 
 var app = builder.Build();
 
